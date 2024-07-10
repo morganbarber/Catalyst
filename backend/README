@@ -1,0 +1,4 @@
+# Backend server for catalyst
+
+Primarily this server will serve endpoints and act as a middleman between the frontend and the database.
+This will also perform secure server sided logic algorithms that involve user data.

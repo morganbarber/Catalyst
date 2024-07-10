@@ -1,0 +1,5 @@
+# Database server for catalyst
+
+This server is primarily for storing and handing off data to the backend servers.
+
+This is not a CDN!!!

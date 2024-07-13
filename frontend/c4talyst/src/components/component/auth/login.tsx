@@ -3,19 +3,28 @@
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { ModeToggle } from "./theme-toggle";
-
-function handleLogin(event: React.FormEvent<HTMLFormElement>) {
-  event.preventDefault();
-
-  const email = (event.currentTarget.email as HTMLInputElement)?.value;
-  const password = (event.currentTarget.password as HTMLInputElement)?.value;
-
-  console.log(email)
-  console.log(password);
-}
+import { ModeToggle } from "../theme-toggle";
+import { useAuth } from './AuthContext';
+import { permanentRedirect } from 'next/navigation';
 
 export function Login() {
+  const { login } = useAuth();
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const email = (event.currentTarget.email as HTMLInputElement)?.value;
+    const password = (event.currentTarget.password as HTMLInputElement)?.value;
+
+    try {
+      await login({ email, password });
+      permanentRedirect('/');
+    } catch (error) {
+      console.error('Login error:', error);
+      alert("Something wen't wrong!");
+    }
+  };
+
   return (
     <div className="flex h-screen items-center justify-center">
       <div className="fixed top-0 right-0 m-4">
@@ -30,7 +39,7 @@ export function Login() {
           <p className="text-muted-foreground">Sign in to your account to continue</p>
         </div>
         <div className="space-y-4">
-        <form className="space-y-4" onSubmit={handleLogin}>
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <Input id="email" type="email" placeholder="Email" required />
           </div>

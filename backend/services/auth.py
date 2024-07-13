@@ -83,3 +83,11 @@ class AuthService:
 
         access_token = create_access_token(identity=user_id)
         return {"access_token": access_token}
+    
+    @staticmethod
+    def validate_token(token):
+        return current_app.jinja_env.globals['validate_token'](token)
+    
+    @staticmethod
+    def logout(token):
+        return current_app.jinja_env.globals['logout'](token)

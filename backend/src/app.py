@@ -3,11 +3,11 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
-from .config import DevelopmentConfig, TestingConfig, ProductionConfig
-from .services import AuthService
-from .models import User
+from config import DevelopmentConfig, TestingConfig, ProductionConfig
+from services import AuthService
+from models import User
 
-db = SQLAlchemy()
+from models import db
 jwt = JWTManager()
 
 def create_app(config_class=DevelopmentConfig):
@@ -110,7 +110,7 @@ def create_app(config_class=DevelopmentConfig):
         except Exception as e:
             return jsonify({'error': 'Internal server error'}), 500
 
-    @app.route('auth/refresh', methods=['POST'])
+    @app.route('/auth/refresh', methods=['POST'])
     @jwt_required(refresh=True)
     def refresh():
         """
@@ -174,4 +174,4 @@ def create_app(config_class=DevelopmentConfig):
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True)
+    app.run(port=8081)

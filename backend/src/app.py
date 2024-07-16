@@ -4,7 +4,6 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager, jwt_required
 from flask_sqlalchemy import SQLAlchemy
 from config import DevelopmentConfig, TestingConfig, ProductionConfig
-from services import AuthService, ExpenseTrackingService, IncomeTrackingService
 from models import User
 from blueprints import expense_bp, auth_bp, income_bp
 
@@ -59,6 +58,11 @@ def create_app(config_class=DevelopmentConfig):
 
     db.init_app(app)
     jwt.init_app(app)
+
+    # we can change directory structure later
+    app.register_blueprint(auth_bp, url_prefix='/')
+    app.register_blueprint(expense_bp, url_prefix='/')
+    app.register_blueprint(income_bp, url_prefix='/')
 
     #  Error Handling for JWT
     @jwt.unauthorized_loader

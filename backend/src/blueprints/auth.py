@@ -5,9 +5,6 @@ from werkzeug.exceptions import NotFound, BadRequest, Unauthorized
 
 auth_bp = Blueprint('auth', __name__)
 
-@auth_bp.route('/auth/refresh', methods=['POST'])
-@jwt_required(refresh=True)
-
 @auth_bp.route('/auth/signup', methods=['POST'])
 def signup():
     """

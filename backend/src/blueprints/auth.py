@@ -5,9 +5,6 @@ from werkzeug.exceptions import NotFound, BadRequest, Unauthorized
 
 auth_bp = Blueprint('auth', __name__)
 
-@auth_bp.route('/auth/refresh', methods=['POST'])
-@jwt_required(refresh=True)
-
 @auth_bp.route('/auth/signup', methods=['POST'])
 def signup():
     """
@@ -105,3 +102,8 @@ def logout():
         return jsonify({'error': str(e)}), 401
     except Exception as e:
         return jsonify({'error': 'Internal server error'}), 500
+    
+@auth_bp.route('/auth/validate', methods=['POST'])
+@jwt_required()
+def validate():
+    return jsonify({'success': True})

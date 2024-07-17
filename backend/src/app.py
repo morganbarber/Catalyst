@@ -76,6 +76,18 @@ def create_app(config_class=DevelopmentConfig):
     @jwt.invalid_token_loader
     def handle_invalid_token():
         return jsonify({'error': 'Invalid token'}), 401
+    
+    @app.errorhandler(404)
+    def not_found(error):
+        return make_response(jsonify({'error': '404 Not found'}), 404)
+    
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        return make_response(jsonify({'error': 'Internal server error'}), 500)
+    
+    @app.errorhandler(400)
+    def bad_request(error):
+        return make_response(jsonify({'error': 'Bad request'}), 400)
 
     return app
 

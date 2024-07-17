@@ -5,20 +5,10 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ModeToggle } from "../theme-toggle";
 import { useAuth } from './AuthContext';
-import { permanentRedirect } from 'next/navigation';
-
-function handleLogin(event: React.FormEvent<HTMLFormElement>) {
-  event.preventDefault();
-
-  const email = (event.currentTarget.email as HTMLInputElement)?.value;
-  const password = (event.currentTarget.password as HTMLInputElement)?.value;
-
-  console.log(email)
-  console.log(password);
-}
+import { redirect } from 'next/navigation';
 
 export function Signup() {
-  const { login } = useAuth();
+  const { signup } = useAuth();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -27,11 +17,11 @@ export function Signup() {
     const password = (event.currentTarget.password as HTMLInputElement)?.value;
 
     try {
-      await login({ email, password });
-      permanentRedirect('/');
+      await signup({ email, password });
+      redirect('/dashboard');
     } catch (error) {
       console.error('Signup error:', error);
-      alert("Something wen't wrong!");
+      alert(error);
     }
   };
 

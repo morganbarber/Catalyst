@@ -1,4 +1,3 @@
-// authContext.ts
 import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -26,7 +25,7 @@ const AuthProvider: React.FC = ({ children: ReactNode }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get('/api/auth/validate_token', {
+        const response = await axios.get('35.83.115.56/auth/validate_token', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
@@ -47,7 +46,7 @@ const AuthProvider: React.FC = ({ children: ReactNode }) => {
 
   const login = async (credentials: any) => {
     try {
-      const response = await axios.post('/api/auth/login', credentials);
+      const response = await axios.post('35.83.115.56/auth/login', credentials);
       localStorage.setItem('accessToken', response.data.access_token);
       localStorage.setItem('refreshToken', response.data.refresh_token);
       setUser(response.data.user);
@@ -56,6 +55,18 @@ const AuthProvider: React.FC = ({ children: ReactNode }) => {
       console.error('Login error:', error);
     }
   };
+
+  const signup = async (user_data: any) => {
+    try {
+      const response = await axios.post('35.83.115.56/auth/signup', user_data);
+      localStorage.setItem('accessToken', response.data.access_token);
+      localStorage.setItem('refreshToken', response.data.refresh_token);
+      setUser(response.data.user);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error('Signup error:', error);
+    }
+  }
 
   const logout = () => {
     localStorage.removeItem('accessToken');

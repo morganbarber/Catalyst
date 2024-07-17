@@ -11,7 +11,7 @@ users_schema = UserSchema(many=True)
 class AuthService:
 
     @staticmethod
-    def signup(user_data):
+    def Signup(user_data):
         """Registers a new user.
 
         Args:
@@ -45,7 +45,7 @@ class AuthService:
         }
 
     @staticmethod
-    def login(user_data):
+    def Login(user_data):
         """Logs in an existing user.
 
         Args:
@@ -71,7 +71,7 @@ class AuthService:
         }
 
     @staticmethod
-    def refresh_token():
+    def Refresh_token():
         """Refreshes an access token.
 
         Returns:
@@ -85,9 +85,9 @@ class AuthService:
         return {"access_token": access_token}
     
     @staticmethod
-    def validate_token(token):
+    def Validate_token(token):
         return current_app.jinja_env.globals['validate_token'](token)
     
     @staticmethod
-    def logout(token):
+    def Logout(token):
         return current_app.jinja_env.globals['logout'](token)

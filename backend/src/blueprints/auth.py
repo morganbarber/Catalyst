@@ -102,3 +102,8 @@ def logout():
         return jsonify({'error': str(e)}), 401
     except Exception as e:
         return jsonify({'error': 'Internal server error'}), 500
+    
+@auth_bp.route('/auth/validate', methods=['POST'])
+@jwt_required()
+def validate():
+    return jsonify({'success': True})

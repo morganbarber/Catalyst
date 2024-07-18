@@ -1,9 +1,10 @@
 from flask import current_app
 from models import User, db
 from schemas import UserSchema
-from utils import generate_password_hash, generate_token
+from utils import generate_token
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity
 from werkzeug.exceptions import BadRequest, Unauthorized
+from werkzeug.security import generate_password_hash
 
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)

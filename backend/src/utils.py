@@ -1,16 +1,4 @@
-from werkzeug.security import generate_password_hash
 import jwt
-
-def generate_password_hash(password):
-    """Hashes a password using a secure algorithm.
-
-    Args:
-        password (str): The password to hash.
-
-    Returns:
-        str: The hashed password.
-    """
-    return generate_password_hash(password)
 
 def generate_token(data, secret_key, expires_in):
     """Generates a JSON Web Token (JWT).

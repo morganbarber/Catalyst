@@ -1,5 +1,5 @@
 import { useCookies } from 'react-cookie';
-import { redirect } from 'next/navigation';
+import { permanentRedirect } from 'next/navigation';
 import { createContext, useState, useEffect, ReactNode } from 'react';
 
 interface User {
@@ -11,8 +11,8 @@ interface AuthContextProps {
   user: User | null; 
   isAuthenticated: boolean;
   loading: boolean;
-  login: (userData: { username: string; password: string }) => Promise<void>; 
-  signup: (userData: { username: string; password: string }) => Promise<void>; 
+  login: (userData: { email: string; password: string }) => Promise<void>; 
+  signup: (userData: { username: string; email: string; password: string }) => Promise<void>; 
   logout: () => Promise<void>;
   refreshToken: () => Promise<void>;
 }
@@ -40,7 +40,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Function to handle user login
   const login = async (userData: any) => {
     try {
-      const response = await fetch('http://35.83.115.56/api/auth/login', {
+      const response = await fetch('http://35.83.115.56/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
@@ -67,11 +67,13 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Function to handle user signup
   const signup = async (userData: any) => {
     try {
-      const response = await fetch('http://35.83.115.56/api/auth/signup', {
+      const response = await fetch('http://35.83.115.56/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
       });
+
+      console.log("signup response", response)
 
       if (response.ok) {
         const data = await response.json();
@@ -129,8 +131,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (error) {
       console.error(error);
-      // Handle token refresh error (e.g., redirect to login)
-      redirect('/login');
+      // Handle token refresh error (e.g., permanentRedirect to login)
+      permanentRedirect('/login');
     } finally {
       setLoading(false); // Ensure loading is set to false after the refresh attempt
     }
@@ -155,7 +157,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       } catch (error) {
         // Access token invalid and refresh failed
-        redirect('/login');
+        permanentRedirect('/login');
       } finally {
         setLoading(false); // Ensure loading is set to false after the check
       }

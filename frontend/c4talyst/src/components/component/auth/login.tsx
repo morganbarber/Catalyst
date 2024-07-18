@@ -4,11 +4,12 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ModeToggle } from "../theme-toggle";
-import { AuthProvider } from './AuthContext';
+import { AuthContext } from './AuthContext';
 import { redirect } from 'next/navigation';
+import React, { useContext } from 'react';
 
 export function Login() {
-  const { login } = AuthProvider({});
+  const { login } = useContext(AuthContext);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

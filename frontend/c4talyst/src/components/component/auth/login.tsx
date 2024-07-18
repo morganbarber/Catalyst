@@ -4,11 +4,11 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ModeToggle } from "../theme-toggle";
-import { useAuth } from './AuthContext';
-import { permanentRedirect } from 'next/navigation';
+import { AuthProvider } from './AuthContext';
+import { redirect } from 'next/navigation';
 
 export function Login() {
-  const { login } = useAuth();
+  const { login } = AuthProvider({});
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -18,9 +18,8 @@ export function Login() {
 
     try {
       await login({ email, password });
-      permanentRedirect('/');
+      redirect('/');
     } catch (error) {
-      console.error('Login error:', error);
       alert("Something wen't wrong!");
     }
   };

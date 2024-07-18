@@ -13,11 +13,12 @@ export function Signup() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    const username = (event.currentTarget.username as HTMLInputElement)?.value;
     const email = (event.currentTarget.email as HTMLInputElement)?.value;
     const password = (event.currentTarget.password as HTMLInputElement)?.value;
 
     try {
-      await signup({ email, password });
+      await signup({ "username": username, "email": email, "password": password });
       redirect('/dashboard');
     } catch (error) {
       console.error('Signup error:', error);
@@ -41,6 +42,9 @@ export function Signup() {
         </div>
         <div className="space-y-4">
         <form className="space-y-4" onSubmit={handleSubmit}>
+          <div className="space-y-2">
+            <Input id="email" type="text" placeholder="Username" required />
+          </div>
           <div className="space-y-2">
             <Input id="email" type="email" placeholder="Email" required />
           </div>

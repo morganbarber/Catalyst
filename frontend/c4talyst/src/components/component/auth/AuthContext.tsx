@@ -1,87 +1,188 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import { useCookies } from 'react-cookie';
+import { redirect } from 'next/navigation';
+import { createContext, useState, useEffect, ReactNode } from 'react';
 
-interface AuthContextType {
-  user: any | null;
-  isAuthenticated: boolean;
-  login: (credentials: any) => Promise<void>;
-  logout: () => void;
-  isLoading: boolean;
+interface User {
+  id: number;
+  username: string;
 }
 
-const AuthContext = createContext<AuthContextType>({
+interface AuthContextProps {
+  user: User | null; 
+  isAuthenticated: boolean;
+  loading: boolean;
+  login: (userData: { username: string; password: string }) => Promise<void>; 
+  signup: (userData: { username: string; password: string }) => Promise<void>; 
+  logout: () => Promise<void>;
+  refreshToken: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextProps>({
   user: null,
   isAuthenticated: false,
+  loading: true,
   login: async () => {},
-  logout: () => {},
-  isLoading: true,
+  signup: async () => {},
+  logout: async () => {},
+  refreshToken: async () => {},
 });
 
-const AuthProvider: React.FC = ({ children: ReactNode }) => {
-  const [user, setUser] = useState<any | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+interface AuthProviderProps {
+  children: ReactNode;
+}
 
-  useEffect(() => {
-    const fetchUser = async () => {
+const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null); 
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [cookies, setCookie, removeCookie] = useCookies(['accessToken', 'refreshToken']);
+
+  // Function to handle user login
+  const login = async (userData: any) => {
+    try {
+      const response = await fetch('http://35.83.115.56/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setCookie('accessToken', data.access_token, { path: '/' });
+        setCookie('refreshToken', data.refresh_token, { path: '/' });
+        setUser(data.user);
+        setIsAuthenticated(true);
+      } else {
+        throw new Error('Invalid credentials');
+      }
+    } catch (error) {
+      console.error(error);
+      // Handle login error (e.g., display an error message)
+      alert("Something went wrong! Try refreshing your page.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to handle user signup
+  const signup = async (userData: any) => {
+    try {
+      const response = await fetch('http://35.83.115.56/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setCookie('accessToken', data.access_token, { path: '/' });
+        setCookie('refreshToken', data.refresh_token, { path: '/' });
+        setUser(data.user);
+        setIsAuthenticated(true);
+      } else {
+        throw new Error('Signup failed');
+      }
+    } catch (error) {
+      console.error(error);
+      // Handle signup error (e.g., display an error message)
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to handle user logout
+  const logout = async () => {
+    try {
+      // await fetch('/api/auth/logout', {
+      //   method: 'POST',
+      //   headers: { 'Authorization': `Bearer ${cookies.accessToken}` },
+      // });
+
+      removeCookie('accessToken', { path: '/' });
+      removeCookie('refreshToken', { path: '/' });
+      setUser(null);
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to refresh the access token
+  const refreshToken = async () => {
+    try {
+      const response = await fetch('http://35.83.115.56/auth/refresh', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${cookies.refreshToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setCookie('accessToken', data.access_token, { path: '/' });
+        setIsAuthenticated(true); // Set isAuthenticated to true after refreshing token
+      } else {
+        throw new Error('Token refresh failed');
+      }
+    } catch (error) {
+      console.error(error);
+      // Handle token refresh error (e.g., redirect to login)
+      redirect('/login');
+    } finally {
+      setLoading(false); // Ensure loading is set to false after the refresh attempt
+    }
+  };
+
+  const checkToken = async () => {
+    if (cookies.accessToken) {
       try {
-        const response = await axios.get('35.83.115.56/auth/validate_token', {
+        const response = await fetch('http://35.83.115.56/auth/validate', {
+          method: 'POST',
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            'Authorization': `Bearer ${cookies.accessToken}`,
+            'Content-Type': 'application/json',
           },
         });
-        if (response.data.user) {
-          setUser(response.data.user);
+
+        if (response.ok) {
           setIsAuthenticated(true);
+        } else {
+          // Access token invalid - attempt to refresh
+          await refreshToken();
         }
       } catch (error) {
-        // Ignore errors, the user is not authenticated
+        // Access token invalid and refresh failed
+        redirect('/login');
       } finally {
-        setIsLoading(false);
+        setLoading(false); // Ensure loading is set to false after the check
       }
-    };
-
-    fetchUser();
-  }, []);
-
-  const login = async (credentials: any) => {
-    try {
-      const response = await axios.post('35.83.115.56/auth/login', credentials);
-      localStorage.setItem('accessToken', response.data.access_token);
-      localStorage.setItem('refreshToken', response.data.refresh_token);
-      setUser(response.data.user);
-      setIsAuthenticated(true);
-    } catch (error) {
-      console.error('Login error:', error);
+    } else {
+      setLoading(false); // Ensure loading is set to false if no token is found
     }
   };
 
-  const signup = async (user_data: any) => {
-    try {
-      const response = await axios.post('35.83.115.56/auth/signup', user_data);
-      localStorage.setItem('accessToken', response.data.access_token);
-      localStorage.setItem('refreshToken', response.data.refresh_token);
-      setUser(response.data.user);
-      setIsAuthenticated(true);
-    } catch (error) {
-      console.error('Signup error:', error);
-    }
-  }
-
-  const logout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    setUser(null);
-    setIsAuthenticated(false);
-  };
+  useEffect(() => {
+    checkToken();
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout, isLoading }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated,
+        loading,
+        login,
+        signup,
+        logout,
+        refreshToken,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
-
-export default AuthProvider;
+export { AuthContext, AuthProvider };

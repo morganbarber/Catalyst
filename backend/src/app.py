@@ -66,19 +66,19 @@ def create_app(config_class=DevelopmentConfig):
 
     #  Error Handling for JWT
     @jwt.unauthorized_loader
-    def handle_unauthorized():
+    def handle_unauthorized(e=None):
         return jsonify({'error': 'Authorization required'}), 401
 
     @jwt.expired_token_loader
-    def handle_expired_token():
+    def handle_expired_token(e=None):
         return jsonify({'error': 'Token has expired'}), 401
 
     @jwt.invalid_token_loader
-    def handle_invalid_token():
+    def handle_invalid_token(e=None):
         return jsonify({'error': 'Invalid token'}), 401
     
     @app.errorhandler(404)
-    def not_found(error):
+    def not_found(error=None):
         return make_response(jsonify({'error': '404 Not found'}), 404)
     
     @app.errorhandler(500)

@@ -1,4 +1,5 @@
 from werkzeug.security import generate_password_hash
+import jwt
 
 def generate_password_hash(password):
     """Hashes a password using a secure algorithm.

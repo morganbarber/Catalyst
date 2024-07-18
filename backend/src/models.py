@@ -48,7 +48,7 @@ class Income(db.Model):
     description = db.Column(db.Text)
     frequency = db.Column(db.Enum('monthly', 'one_time', 'annually', name='income_frequency'), nullable=False)
     date = db.Column(db.Date)
-    user = db.relationship('User', backref=db.backref('incomes', lazy=True))
+    user_income = db.relationship('User', backref='incomes', lazy='dynamic')
 
     def __repr__(self):
         return f'<Income {self.name} - {self.amount}>'
@@ -63,7 +63,7 @@ class Expense(db.Model):
     category = db.Column(db.String(50), nullable=False)
     color = db.Column(db.String(10))
     date = db.Column(db.Date)
-    user = db.relationship('User', backref=db.backref('expenses', lazy=True))
+    user_expense = db.relationship('User', backref='expenses', lazy='dynamic')
 
     def __repr__(self):
         return f'<Expense {self.name} - {self.amount}>'

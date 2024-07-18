@@ -82,6 +82,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(data.user);
         setIsAuthenticated(true);
       } else {
+        console.log(response)
         throw new Error('Signup failed');
       }
     } catch (error) {

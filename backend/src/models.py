@@ -1,11 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-import os
-import sys
 
 db = SQLAlchemy()
 
 class User(db.Model):
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -48,7 +47,6 @@ class Income(db.Model):
     description = db.Column(db.Text)
     frequency = db.Column(db.Enum('monthly', 'one_time', 'annually', name='income_frequency'), nullable=False)
     date = db.Column(db.Date)
-    user_income = db.relationship('User', backref='incomes', lazy='dynamic')
 
     def __repr__(self):
         return f'<Income {self.name} - {self.amount}>'
@@ -63,7 +61,6 @@ class Expense(db.Model):
     category = db.Column(db.String(50), nullable=False)
     color = db.Column(db.String(10))
     date = db.Column(db.Date)
-    user_expense = db.relationship('User', backref='expenses', lazy='dynamic')
 
     def __repr__(self):
         return f'<Expense {self.name} - {self.amount}>'

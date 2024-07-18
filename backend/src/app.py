@@ -88,6 +88,9 @@ def create_app(config_class=DevelopmentConfig):
     @app.errorhandler(400)
     def bad_request(error):
         return make_response(jsonify({'error': 'Bad request'}), 400)
+    
+    with app.app_context():
+        db.create_all()
 
     return app
 

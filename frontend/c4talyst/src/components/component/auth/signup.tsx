@@ -4,11 +4,12 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ModeToggle } from "../theme-toggle";
-import { useAuth } from './AuthContext';
+import { AuthContext } from './AuthContext';
 import { redirect } from 'next/navigation';
+import React, { useContext } from 'react';
 
 export function Signup() {
-  const { signup } = useAuth();
+  const { signup } = useContext(AuthContext);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -21,11 +22,10 @@ export function Signup() {
       await signup({ "username": username, "email": email, "password": password });
       redirect('/dashboard');
     } catch (error) {
-      console.error('Signup error:', error);
-      alert(error);
+      console.log(error);
+      alert("Something wen't wrong!");
     }
   };
-
 
   return (
     <div className="flex h-screen items-center justify-center">
@@ -37,13 +37,13 @@ export function Signup() {
       </div>
       <div className="mx-auto max-w-sm space-y-6">
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold md:text-4xl">Welcome to C4TALYST!</h1>
+          <h1 className="text-3xl font-bold md:text-4xl">Welcome Back</h1>
           <p className="text-muted-foreground">Sign up to continue</p>
         </div>
         <div className="space-y-4">
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
-            <Input id="email" type="text" placeholder="Username" required />
+            <Input id="username" type="text" placeholder="Username" required />
           </div>
           <div className="space-y-2">
             <Input id="email" type="email" placeholder="Email" required />
@@ -53,7 +53,7 @@ export function Signup() {
           </div>
           <div className="mt-4">
             <Button type="submit" className="w-full">
-              Sign Up
+              Sign In
             </Button>
           </div>
         </form>

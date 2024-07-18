@@ -31,6 +31,8 @@ class Income(db.Model):
     frequency = db.Column(db.Enum('monthly', 'one_time', 'annually', name='income_frequency'), nullable=False)
     date = db.Column(db.Date)
 
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
     def __repr__(self):
         return f'<Income {self.name} - {self.amount}>'
 
@@ -45,6 +47,8 @@ class Expense(db.Model):
     category = db.Column(db.String(50), nullable=False)
     color = db.Column(db.String(10))
     date = db.Column(db.Date)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __repr__(self):
         return f'<Expense {self.name} - {self.amount}>'

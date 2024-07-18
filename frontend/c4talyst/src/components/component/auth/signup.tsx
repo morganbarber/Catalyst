@@ -53,7 +53,7 @@ export function Signup() {
           </div>
           <div className="mt-4">
             <Button type="submit" className="w-full">
-              Sign In
+              Sign Up
             </Button>
           </div>
         </form>

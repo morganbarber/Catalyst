@@ -25,7 +25,6 @@ class User(db.Model):
 class Income(db.Model):
     __tablename__ = 'income'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     name = db.Column(db.String(100), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     description = db.Column(db.Text)
@@ -39,7 +38,6 @@ class Income(db.Model):
 class Expense(db.Model):
     __tablename__ = 'expense'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     description = db.Column(db.Text)

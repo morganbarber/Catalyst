@@ -23,7 +23,6 @@ export function Signup() {
       redirect('/dashboard');
     } catch (error) {
       console.log(error);
-      alert("Something wen't wrong!");
     }
   };
 
@@ -37,7 +36,7 @@ export function Signup() {
       </div>
       <div className="mx-auto max-w-sm space-y-6">
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold md:text-4xl">Welcome Back</h1>
+          <h1 className="text-3xl font-bold md:text-4xl">Welcome to C4TALYST</h1>
           <p className="text-muted-foreground">Sign up to continue</p>
         </div>
         <div className="space-y-4">

@@ -14,14 +14,15 @@ export function Login() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    const username = (event.currentTarget.username as HTMLInputElement)?.value;
     const email = (event.currentTarget.email as HTMLInputElement)?.value;
     const password = (event.currentTarget.password as HTMLInputElement)?.value;
 
     try {
-      await login({ email, password });
+      await login({ "email": email, "password": password, "username": username });
       redirect('/');
     } catch (error) {
-      alert("Something wen't wrong!");
+      // alert("Something wen't wrong");
     }
   };
 
@@ -40,6 +41,9 @@ export function Login() {
         </div>
         <div className="space-y-4">
         <form className="space-y-4" onSubmit={handleSubmit}>
+          <div className="space-y-2">
+            <Input id="username" type="text" placeholder="Username" required />
+          </div>
           <div className="space-y-2">
             <Input id="email" type="email" placeholder="Email" required />
           </div>

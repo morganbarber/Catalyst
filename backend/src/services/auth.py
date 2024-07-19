@@ -32,7 +32,7 @@ class AuthService:
         user = User(
             username=user_data['username'],
             email=user_data['email'],
-            password_hash=generate_password_hash(user_data['password'])
+            password_hash=generate_password_hash(user_data['password'], "sha256")
         )
         db.session.add(user)
         db.session.commit()
@@ -60,7 +60,7 @@ class AuthService:
             raise BadRequest(errors)
 
         user = User.query.filter_by(email=user_data['email']).first()
-        if not user or not user.check_password(user_data['password']):
+        if not user or not user.check_password(user_data['password'], "sha256"):
             raise Unauthorized('Invalid credentials')
 
         access_token = create_access_token(identity=user.id)

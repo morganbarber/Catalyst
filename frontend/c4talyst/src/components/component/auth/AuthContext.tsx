@@ -58,7 +58,6 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       console.error(error);
       // Handle login error (e.g., display an error message)
-      alert("Something went wrong! Try refreshing your page.");
     } finally {
       setLoading(false);
     }

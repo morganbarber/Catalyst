@@ -54,7 +54,7 @@ def create_app(config_class=DevelopmentConfig):
         return jsonify({'error': 'Authorization required'}), 401
 
     @jwt.expired_token_loader
-    def handle_expired_token(e=None):
+    def handle_expired_token(e=None, exp=None):
         return jsonify({'error': 'Token has expired'}), 401
 
     @jwt.invalid_token_loader

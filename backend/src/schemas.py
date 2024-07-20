@@ -31,6 +31,7 @@ class ExpenseSchema(Schema):
     frequency = fields.Enum(enum=ExpenseFrequency, required=True)
     color = fields.String()
     date = fields.Date()
+    amount = fields.Float(required=True)
 
     class Meta:
         fields = ("id", "user_id", "name", "description", "frequency", "color", "date")

@@ -36,7 +36,6 @@ class ExpenseTrackingService:
             amount=expense_data['amount'],
             description=expense_data.get('description'),
             frequency=expense_data['frequency'],
-            category=expense_data['category'],
             color=expense_data.get('color'),
             date=expense_data.get('date')
         )
@@ -112,7 +111,6 @@ class ExpenseTrackingService:
         expense.amount = expense_data.get('amount', expense.amount)
         expense.description = expense_data.get('description', expense.description)
         expense.frequency = expense_data.get('frequency', expense.frequency)
-        expense.category = expense_data.get('category', expense.category)
         expense.color = expense_data.get('color', expense.color)
         expense.date = expense_data.get('date', expense.date)
 

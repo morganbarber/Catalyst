@@ -34,4 +34,4 @@ class ExpenseSchema(Schema):
     amount = fields.Float(required=True)
 
     class Meta:
-        fields = ("id", "user_id", "name", "description", "frequency", "color", "date")
+        fields = ("id", "user_id", "name", "description", "frequency", "color", "date", "amount")

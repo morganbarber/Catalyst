@@ -60,8 +60,6 @@ class ExpenseTrackingService:
             NotFound: If no expenses are found for the user.
         """
         expenses = Expense.query.filter_by(user_id=get_jwt_identity()).all()
-        if not expenses:
-            raise NotFound('No expenses found')
 
         return expenses_schema.dump(expenses)
 

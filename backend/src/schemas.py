@@ -35,4 +35,4 @@ class ExpenseSchema(Schema):
     date = fields.Date()
 
     class Meta:
-        fields = ("id", "user_id", "name", "amount", "description", "frequency", "category", "color", "date")
+        fields = ("id", "user_id", "name", "amount", "description", "frequency", "color", "date")

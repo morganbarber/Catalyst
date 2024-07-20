@@ -27,12 +27,11 @@ class ExpenseSchema(Schema):
     id = fields.Integer(dump_only=True)
     user_id = fields.Integer(dump_only=True)
     name = fields.String(required=True)
-    amount = fields.Float(required=True)
     description = fields.String()
     frequency = fields.Enum(enum=ExpenseFrequency, required=True)
-    category = fields.String(required=True)
     color = fields.String()
     date = fields.Date()
+    amount = fields.Float(required=True)
 
     class Meta:
-        fields = ("id", "user_id", "name", "amount", "description", "frequency", "category", "color", "date")
+        fields = ("id", "user_id", "name", "description", "frequency", "color", "date", "amount")

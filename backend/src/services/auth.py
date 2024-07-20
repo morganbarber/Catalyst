@@ -32,7 +32,7 @@ class AuthService:
         user = User(
             username=user_data['username'],
             email=user_data['email'],
-            password_hash=generate_password_hash(user_data['password'], "sha256")
+            password_hash=generate_password_hash(user_data['password'])
         )
         db.session.add(user)
         db.session.commit()

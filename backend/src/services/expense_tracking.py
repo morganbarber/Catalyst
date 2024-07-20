@@ -47,7 +47,7 @@ class ExpenseTrackingService:
 
     @staticmethod
     @jwt_required()
-    def get_expenses(user_id=None):
+    def get_expenses():
         """Retrieves all expenses for the current user.
 
         Args:
@@ -59,9 +59,7 @@ class ExpenseTrackingService:
         Raises:
             NotFound: If no expenses are found for the user.
         """
-        if user_id is None:
-            user_id = get_jwt_identity()
-        expenses = Expense.query.filter_by(user_id=user_id).all()
+        expenses = Expense.query.filter_by(user_id=get_jwt_identity()).all()
         if not expenses:
             raise NotFound('No expenses found')
 

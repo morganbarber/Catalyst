@@ -1,14 +1,7 @@
 "use client";
 
-import { Dashboard } from "@/components/component/dashboard/dashboard";
-import { AuthContext } from "@/components/component/auth/AuthContext";
+import { redirect } from "next/navigation";
  
 export default function Home() {
-  return (
-    <main style={{ overflow: 'hidden' }}>
-      <div style={{ overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
-        <Dashboard/>
-      </div>
-    </main>
-  );
+  redirect("/dashboard/main");
 }

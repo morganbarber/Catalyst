@@ -11,3 +11,4 @@ class ExpenseFrequency(Enum):
     annually = 'annually'
     bi_weekly = 'bi_weekly'
     weekly = 'weekly'
+    daily = 'daily'

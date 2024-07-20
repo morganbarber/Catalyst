@@ -60,7 +60,7 @@ class AuthService:
             raise BadRequest(errors)
 
         user = User.query.filter_by(email=user_data['email']).first()
-        if not user or not user.check_password(user_data['password'], "sha256"):
+        if not user or not user.check_password(user_data['password']):
             raise Unauthorized('Invalid credentials')
 
         access_token = create_access_token(identity=user.id)

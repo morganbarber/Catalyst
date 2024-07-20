@@ -40,7 +40,7 @@ class Expense(db.Model):
     name = db.Column(db.String(100), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     description = db.Column(db.Text)
-    frequency = db.Column(db.Enum('monthly', 'one_time', 'annually', name='expense_frequency'), nullable=False)
+    frequency = db.Column(db.Enum('monthly', 'one_time', 'annually', 'bi_weekly', 'weekly', 'daily', name='expense_frequency'), nullable=False)
     category = db.Column(db.String(50), nullable=False)
     color = db.Column(db.String(10))
     date = db.Column(db.Date)

@@ -38,12 +38,11 @@ class Income(db.Model):
 
 class Expense(db.Model):
     __tablename__ = 'expense'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     name = db.Column(db.String(100), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     description = db.Column(db.Text)
     frequency = db.Column(db.Enum(ExpenseFrequency), nullable=False)
-    category = db.Column(db.String(50), nullable=False)
     color = db.Column(db.String(10))
     date = db.Column(db.Date)
 

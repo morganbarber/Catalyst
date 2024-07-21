@@ -35,6 +35,25 @@ export function ExpenseTable() {
     }
   }
 
+  const enumToFrequency = (frequency: string) => {
+    switch (frequency) {
+      case 'daily':
+        return 'Daily'
+      case 'weekly':
+        return 'Weekly'
+      case 'monthly':
+        return 'Monthly'
+      case 'annually':
+        return 'Yearly'
+      case 'one_time':
+        return 'One-time'
+      case 'bi_weekly':
+        return 'Bi-Weekly'
+      default:
+        return null
+    }
+  }
+
   useEffect(() => {
     const fetchExpenseData = async () => {
       try {
@@ -50,6 +69,7 @@ export function ExpenseTable() {
         }
         const data = await response.json();
         setExpenses(data);
+        console.log(data)
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -124,7 +144,7 @@ export function ExpenseTable() {
     }
   }
 
-  const handleEditExpense = (id: number, updatedExpense: any) => {
+  const handleEditExpense = async (id: number, updatedExpense: any) => {
     setExpenses(
       expenses.map((expense) =>
         expense.id === id
@@ -140,10 +160,50 @@ export function ExpenseTable() {
           : expense,
       ),
     )
+    try {
+      const response = await fetch('http://35.83.115.56/expense/' + id, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${cookies.accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: updatedExpense.name,
+          frequency: frequencyToEnum(updatedExpense.frequency),
+          amount: parseFloat(updatedExpense.amount),
+          date: updatedExpense.date,
+          description: updatedExpense.description,
+          color: updatedExpense.color,
+        }),
+      });
+      console.log(updatedExpense.frequency)
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+    } catch (error) {
+      console.error('Error deleting expense:', error);
+    }
     setIsEditExpenseDialogOpen(false)
   }
 
-  const handleDeleteExpense = (id: number) => {
+  const handleDeleteExpense = async (id: number) => {
+    try {
+      const response = await fetch('http://35.83.115.56/expense/' + id, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${cookies.accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      setExpenses(data);
+    } catch (error) {
+      console.error('Error deleting expense:', error);
+    }
     setExpenses(expenses.filter((expense) => expense.id !== id))
   }
 
@@ -177,7 +237,7 @@ export function ExpenseTable() {
                     <div className={`w-4 h-4 rounded-full mr-2`} style={{ backgroundColor: expense.color }} />
                     {expense.name}
                   </TableCell>
-                  <TableCell>{expense.frequency}</TableCell>
+                  <TableCell>{enumToFrequency(expense.frequency)}</TableCell>
                   <TableCell>${expense.amount.toFixed(2)}</TableCell>
                   <TableCell>{expense.date}</TableCell>
                   <TableCell>

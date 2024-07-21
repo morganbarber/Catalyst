@@ -21,7 +21,7 @@ class IncomeSchema(Schema):
     date = fields.Date()
 
     class Meta:
-        fields = ("id", "user_id", "name", "amount", "description", "frequency", "date")
+        fields = ("id", "user_id", "name", "amount", "color", "description", "frequency", "date")
 
 class ExpenseSchema(Schema):
     id = fields.Integer(dump_only=True)

@@ -18,7 +18,6 @@ class IncomeSchema(Schema):
     amount = fields.Float(required=True)
     description = fields.String()
     frequency = fields.Enum(enum=IncomeFrequency, required=True)
-    date = fields.Date()
 
     class Meta:
         fields = ("id", "user_id", "name", "amount", "color", "description", "frequency", "date")

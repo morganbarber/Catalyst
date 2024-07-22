@@ -27,7 +27,7 @@ class Income(db.Model):
     name = db.Column(db.String(100), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     description = db.Column(db.Text)
-    frequency = db.Column(db.Enum('monthly', 'one_time', 'annually', name='income_frequency'), nullable=False)
+    frequency = db.Column(db.Enum(IncomeFrequency), nullable=False)
     color = db.Column(db.String(10))
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

@@ -36,7 +36,6 @@ class IncomeTrackingService:
             amount=income_data['amount'],
             description=income_data.get('description'),
             frequency=income_data['frequency'],
-            date=income_data.get('date')
         )
         db.session.add(income)
         db.session.commit()
@@ -60,8 +59,6 @@ class IncomeTrackingService:
         if user_id is None:
             user_id = get_jwt_identity()
         incomes = Income.query.filter_by(user_id=user_id).all()
-        if not incomes:
-            raise NotFound('No incomes found')
 
         return incomes_schema.dump(incomes)
 

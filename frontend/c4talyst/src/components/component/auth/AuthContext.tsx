@@ -11,7 +11,7 @@ interface AuthContextProps {
   user: User | null; 
   isAuthenticated: boolean;
   loading: boolean;
-  login: (userData: { email: string; password: string }) => Promise<void>; 
+  login: (userData: { email: string; password: string; username: string }) => Promise<void>; 
   signup: (userData: { username: string; email: string; password: string }) => Promise<void>; 
   logout: () => Promise<void>;
   refreshToken: () => Promise<void>;
@@ -168,7 +168,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     checkToken();
-  }, []); // Empty dependency array ensures this runs only once on mount
+  }); // Empty dependency array ensures this runs only once on mount
 
   return (
     <AuthContext.Provider

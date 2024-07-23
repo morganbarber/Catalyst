@@ -11,11 +11,12 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { useCookies } from 'react-cookie';
-import { redirect } from "next/navigation"
+import { ValueProvider, useValue } from "./financeContext"
 
-export function ExpenseTable() {
-  const [expenses, setExpenses] = useState<{ id: number; name: string; frequency: string; amount: number; date: string; color: string; description: string; }[]>([]);
+export function IncomeTable() {
+  const [Incomes, setIncomes] = useState<{ id: number; name: string; frequency: string; amount: number; color: string; description: string; }[]>([]);
   const [cookies, setCookie, removeCookie] = useCookies(['accessToken', 'refreshToken']);
+
 
   const frequencyToEnum = (frequency: string) => {
     switch (frequency) {
@@ -56,9 +57,9 @@ export function ExpenseTable() {
   }
 
   useEffect(() => {
-    const fetchExpenseData = async () => {
+    const fetchIncomeData = async () => {
       try {
-        const response = await fetch('http://35.83.115.56/expense', {
+        const response = await fetch('http://35.83.115.56/income', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${cookies.accessToken}`,
@@ -69,133 +70,126 @@ export function ExpenseTable() {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        setExpenses(data);
+        setIncomes(data);
         console.log(data)
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
-    fetchExpenseData();
+    fetchIncomeData();
   }, []);
 
-  const [newExpense, setNewExpense] = useState({
+  const [newIncome, setNewIncome] = useState({
     name: "",
     frequency: "",
     amount: "",
-    date: "",
     description: "",
     color: `#FFFFFF`,
   })
 
-  const [isAddExpenseDialogOpen, setIsAddExpenseDialogOpen] = useState(false)
-  const [isEditExpenseDialogOpen, setIsEditExpenseDialogOpen] = useState(false)
-  const [isExpenseDetailsDialogOpen, setIsExpenseDetailsDialogOpen] = useState(false)
-  const [expenseToEdit, setExpenseToEdit] = useState(null)
-  const [expenseToView, setExpenseToView] = useState(null)
+  const [isAddIncomeDialogOpen, setIsAddIncomeDialogOpen] = useState(false)
+  const [isEditIncomeDialogOpen, setIsEditIncomeDialogOpen] = useState(false)
+  const [isIncomeDetailsDialogOpen, setIsIncomeDetailsDialogOpen] = useState(false)
+  const [IncomeToEdit, setIncomeToEdit] = useState(null)
+  const [incomeToView, setIncomeToView] = useState(null)
 
-  const handleAddExpense = async () => {
-    if (newExpense.name && newExpense.frequency && newExpense.amount && newExpense.date) {
+  const handleAddIncome = async () => {
+    if (newIncome.name && newIncome.frequency && newIncome.amount) {
       try {
-        const response = await fetch('http://35.83.115.56/expense', {
+        const response = await fetch('http://35.83.115.56/income', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${cookies.accessToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            name: newExpense.name,
-            frequency: frequencyToEnum(newExpense.frequency),
-            amount: parseFloat(newExpense.amount),
-            date: newExpense.date,
-            description: newExpense.description,
-            color: newExpense.color,
+            name: newIncome.name,
+            frequency: frequencyToEnum(newIncome.frequency),
+            amount: parseFloat(newIncome.amount),
+            description: newIncome.description,
+            color: newIncome.color,
           }),
         });
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        var data = await response.json();
       } catch (error) {
         console.error('Error fetching response:', error);
       }
       
-      setExpenses([
-        ...expenses,
+      setIncomes([
+        ...Incomes,
         {
-          id: data.id,
-          name: data.name,
-          frequency: enumToFrequency(data.frequency),
-          amount: parseFloat(data.amount),
-          date: data.date,
-          color: data.color || `#FFFFFF`,
-          description: data.description,
+          id: Incomes.length + 1,
+          name: newIncome.name,
+          frequency: newIncome.frequency,
+          amount: parseFloat(newIncome.amount),
+          color: `#FFFFFF`,
+          description: "",
         },
       ])
 
-      setNewExpense({
+      setNewIncome({
         name: "",
         frequency: "",
         amount: "",
-        date: "",
         description: "",
         color: `#FFFFFF`,
       })
 
-      setIsAddExpenseDialogOpen(false)
+      setIsAddIncomeDialogOpen(false)
     }
   }
 
-  const handleEditExpense = async (id: number, updatedExpense: any) => {
-    setExpenses(
-      expenses.map((expense) =>
-        expense.id === id
+  const handleEditIncome = async (id: number, updatedIncome: any) => {
+    setIncomes(
+      Incomes.map((income) =>
+        income.id === id
           ? {
-              ...expense,
-              name: updatedExpense.name,
-              frequency: updatedExpense.frequency,
-              amount: updatedExpense.amount,
-              date: updatedExpense.date,
-              color: updatedExpense.color,
-              description: updatedExpense.description,
+              ...income,
+              name: updatedIncome.name,
+              frequency: updatedIncome.frequency,
+              amount: updatedIncome.amount,
+              color: updatedIncome.color,
+              description: updatedIncome.description,
             }
-          : expense,
+          : income,
       ),
     )
 
-    const expense = expenses.find((expense) => expense.id === id);
+    const income = Incomes.find((income) => income.id === id);
     
     try {
-      const response = await fetch('http://35.83.115.56/expense/' + id, {
+      const response = await fetch('http://35.83.115.56/income/' + id, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${cookies.accessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: expense.name,
-          frequency: frequencyToEnum(expense.frequency),
-          amount: parseFloat(expense.amount),
-          date: expense.date,
-          description: expense.description,
-          color: expense.color,
+          name: updatedIncome.name ?? income.name,
+          frequency: frequencyToEnum(updatedIncome.frequency) ?? frequencyToEnum(income.frequency),
+          amount: parseFloat(updatedIncome.amount.toString()) ?? parseFloat(income.amount.toString()),
+          description: updatedIncome.description ?? income.description,
+          color: updatedIncome.color ?? income.color,
         }),
       });
-      console.log(updatedExpense.frequency)
+      console.log(updatedIncome.frequency)
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
 
     } catch (error) {
-      console.error('Error deleting expense:', error);
+      console.error('Error deleting income:', error);
     }
-    setIsEditExpenseDialogOpen(false)
+    setIsEditIncomeDialogOpen(false)
   }
 
-  const handleDeleteExpense = async (id: number, event) => {
+  const handleDeleteIncome = async (id: number, event) => {
     event.stopPropagation();
     try {
-      const response = await fetch('http://35.83.115.56/expense/' + id, {
+      const response = await fetch('http://35.83.115.56/income/' + id, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${cookies.accessToken}`,
@@ -206,51 +200,48 @@ export function ExpenseTable() {
         throw new Error('Network response was not ok');
       }
     } catch (error) {
-      console.error('Error deleting expense:', error);
+      console.error('Error deleting income:', error);
     }
-    setExpenses(expenses.filter((expense) => expense.id !== id))
+    setIncomes(Incomes.filter((income) => income.id !== id))
   }
 
-  const handleOpenEditExpenseDialog = (expense, event) => {
-    event.stopPropagation();
-    setExpenseToEdit(expense)
-    setIsEditExpenseDialogOpen(true)
-    setIsExpenseDetailsDialogOpen(false)
+  const handleOpenEditIncomeDialog = (income, event) => {
+    setIncomeToEdit(income)
+    setIsEditIncomeDialogOpen(true)
+    setIsIncomeDetailsDialogOpen(false)
   }
 
-  const handleOpenExpenseDetailsDialog = (expense) => {
-    setExpenseToView(expense)
-    setIsExpenseDetailsDialogOpen(true)
+  const handleOpenIncomeDetailsDialog = (income: any) => {
+    setIncomeToView(income)
+    setIsIncomeDetailsDialogOpen(true)
   }
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
+    <Card className="w-full max-w-4xl mx-auto d-flex align-items-center justify-content-center">
       <CardHeader>
-        <CardTitle>Expense Tracker</CardTitle>
-        <CardDescription>Keep track of your expenses and manage your budget.</CardDescription>
+        <CardTitle>Income Tracker</CardTitle>
+        <CardDescription>Keep track of your income and manage your budget.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="mt-4 border rounded-lg overflow-auto">
           <Table className="mx-auto">
             <TableHeader>
               <TableRow>
-                <TableHead>Expense</TableHead>
+                <TableHead>Income</TableHead>
                 <TableHead>Frequency</TableHead>
                 <TableHead>Amount</TableHead>
-                <TableHead>Date</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {expenses.map((expense) => (
-                <TableRow key={expense.id} onClick={() => handleOpenExpenseDetailsDialog(expense)}>
+              {Incomes.map((income) => (
+                <TableRow key={income.id} onClick={() => handleOpenIncomeDetailsDialog(income)}>
                   <TableCell className="flex items-center">
-                    <div className={`w-4 h-4 rounded-full mr-2`} style={{ backgroundColor: expense.color }} />
-                    {expense.name}
+                    <div className={`w-4 h-4 rounded-full mr-2`} style={{ backgroundColor: income.color }} />
+                    {income.name}
                   </TableCell>
-                  <TableCell>{enumToFrequency(expense.frequency)}</TableCell>
-                  <TableCell>${expense.amount.toFixed(2)}</TableCell>
-                  <TableCell>{expense.date}</TableCell>
+                  <TableCell>{enumToFrequency(income.frequency)}</TableCell>
+                  <TableCell>${income.amount.toFixed(2)}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -260,8 +251,8 @@ export function ExpenseTable() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={(event) => handleOpenEditExpenseDialog(expense, event)}>Edit</DropdownMenuItem>
-                        <DropdownMenuItem onClick={(event) => handleDeleteExpense(expense.id, event)}>Delete</DropdownMenuItem>
+                        <DropdownMenuItem onClick={(event) => handleOpenEditIncomeDialog(income, event)}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem onClick={(event) => handleDeleteIncome(income.id, event)}>Delete</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -271,25 +262,24 @@ export function ExpenseTable() {
           </Table>
         </div>
         <div className="grid gap-4 mt-4">
-          <Button onClick={() => setIsAddExpenseDialogOpen(true)}>Add Expense</Button>
+          <Button onClick={() => setIsAddIncomeDialogOpen(true)}>Add income</Button>
         </div>
-        
-        <Dialog open={isAddExpenseDialogOpen} onOpenChange={setIsAddExpenseDialogOpen}>
+        <Dialog open={isAddIncomeDialogOpen} onOpenChange={setIsAddIncomeDialogOpen}>
           <DialogContent className="sm:max-w-md bg-background text-foreground">
             <DialogHeader>
-              <DialogTitle>Add Expense</DialogTitle>
-              <DialogDescription>Enter the details of your new expense.</DialogDescription>
+              <DialogTitle>Add income</DialogTitle>
+              <DialogDescription>Enter the details of your new income.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name" className="text-foreground">
-                    Expense Name
+                    income Name
                   </Label>
                   <Input
                     id="name"
-                    value={newExpense.name}
-                    onChange={(e) => setNewExpense({ ...newExpense, name: e.target.value })}
+                    value={newIncome.name}
+                    onChange={(e) => setNewIncome({ ...newIncome, name: e.target.value })}
                     placeholder="Grocery shopping"
                   />
                 </div>
@@ -299,14 +289,13 @@ export function ExpenseTable() {
                   </Label>
                   <Select
                     id="frequency"
-                    value={newExpense.frequency}
-                    onValueChange={(value) => setNewExpense({ ...newExpense, frequency: value })}
+                    value={newIncome.frequency}
+                    onValueChange={(value) => setNewIncome({ ...newIncome, frequency: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select frequency" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="One-time">One-time</SelectItem>
                       <SelectItem value="Daily">Daily</SelectItem>
                       <SelectItem value="Weekly">Weekly</SelectItem>
                       <SelectItem value="Bi-Weekly">Bi-Weekly</SelectItem>
@@ -324,20 +313,9 @@ export function ExpenseTable() {
                   <Input
                     id="amount"
                     type="number"
-                    value={newExpense.amount}
-                    onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
+                    value={newIncome.amount}
+                    onChange={(e) => setNewIncome({ ...newIncome, amount: e.target.value })}
                     placeholder="100"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="date" className="text-foreground">
-                    Date
-                  </Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    value={newExpense.date}
-                    onChange={(e) => setNewExpense({ ...newExpense, date: e.target.value })}
                   />
                 </div>
               </div>
@@ -347,36 +325,36 @@ export function ExpenseTable() {
                 </Label>
                 <Textarea
                   id="description"
-                  value={newExpense.description}
-                  onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
+                  value={newIncome.description}
+                  onChange={(e) => setNewIncome({ ...newIncome, description: e.target.value })}
                   placeholder="Grocery shopping for the week"
                 />
               </div>
               <div className="flex justify-center gap-2">
-                <Button variant="outline" onClick={() => setIsAddExpenseDialogOpen(false)}>
+                <Button variant="outline" onClick={() => setIsAddIncomeDialogOpen(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleAddExpense}>Add Expense</Button>
+                <Button onClick={handleAddIncome}>Add income</Button>
               </div>
             </div>
           </DialogContent>
         </Dialog>
-        <Dialog open={isEditExpenseDialogOpen} onOpenChange={setIsEditExpenseDialogOpen}>
+        <Dialog open={isEditIncomeDialogOpen} onOpenChange={setIsEditIncomeDialogOpen}>
           <DialogContent className="sm:max-w-md bg-background text-foreground">
             <DialogHeader>
-              <DialogTitle>Edit Expense</DialogTitle>
-              <DialogDescription>Update the details of the expense.</DialogDescription>
+              <DialogTitle>Edit income</DialogTitle>
+              <DialogDescription>Update the details of the income.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name" className="text-foreground">
-                    Expense Name
+                    income Name
                   </Label>
                   <Input
                     id="name"
-                    value={expenseToEdit?.name || ""}
-                    onChange={(e) => setExpenseToEdit({ ...expenseToEdit, name: e.target.value })}
+                    value={IncomeToEdit?.name || ""}
+                    onChange={(e) => setIncomeToEdit({ ...IncomeToEdit, name: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
@@ -385,8 +363,8 @@ export function ExpenseTable() {
                   </Label>
                   <Select
                     id="frequency"
-                    value={expenseToEdit?.frequency || ""}
-                    onValueChange={(value) => setExpenseToEdit({ ...expenseToEdit, frequency: value })}
+                    value={newIncome.frequency}
+                    onValueChange={(value) => setNewIncome({ ...newIncome, frequency: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select frequency" />
@@ -410,19 +388,8 @@ export function ExpenseTable() {
                   <Input
                     id="amount"
                     type="number"
-                    value={expenseToEdit?.amount || ""}
-                    onChange={(e) => setExpenseToEdit({ ...expenseToEdit, amount: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="date" className="text-foreground">
-                    Date
-                  </Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    value={expenseToEdit?.date || ""}
-                    onChange={(e) => setExpenseToEdit({ ...expenseToEdit, date: e.target.value })}
+                    value={IncomeToEdit?.amount || ""}
+                    onChange={(e) => setIncomeToEdit({ ...IncomeToEdit, amount: e.target.value })}
                   />
                 </div>
               </div>
@@ -432,8 +399,8 @@ export function ExpenseTable() {
                 </Label>
                 <Textarea
                   id="description"
-                  value={expenseToEdit?.description || ""}
-                  onChange={(e) => setExpenseToEdit({ ...expenseToEdit, description: e.target.value })}
+                  value={IncomeToEdit?.description || ""}
+                  onChange={(e) => setIncomeToEdit({ ...IncomeToEdit, description: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
@@ -443,38 +410,38 @@ export function ExpenseTable() {
                 <Input
                   id="color"
                   type="color"
-                  value={expenseToEdit?.color || ""}
-                  onChange={(e) => setExpenseToEdit({ ...expenseToEdit, color: e.target.value })}
+                  value={IncomeToEdit?.color || ""}
+                  onChange={(e) => setIncomeToEdit({ ...IncomeToEdit, color: e.target.value })}
                 />
               </div>
               <div className="flex justify-center gap-2">
-                <Button variant="outline" onClick={() => setIsEditExpenseDialogOpen(false)}>
+                <Button variant="outline" onClick={() => setIsEditIncomeDialogOpen(false)}>
                   Cancel
                 </Button>
-                <Button onClick={() => handleEditExpense(expenseToEdit.id, expenseToEdit)}>Save Changes</Button>
+                <Button onClick={() => handleEditIncome(IncomeToEdit.id, IncomeToEdit)}>Save Changes</Button>
               </div>
             </div>
           </DialogContent>
         </Dialog>
-        <Dialog open={isExpenseDetailsDialogOpen} onOpenChange={setIsExpenseDetailsDialogOpen}>
+        <Dialog open={isIncomeDetailsDialogOpen} onOpenChange={setIsIncomeDetailsDialogOpen}>
           <DialogContent className="sm:max-w-md bg-background text-foreground">
             <DialogHeader>
-              <DialogTitle>Expense Details</DialogTitle>
-              <DialogDescription>View the details of the selected expense.</DialogDescription>
+              <DialogTitle>Income Details</DialogTitle>
+              <DialogDescription>View the details of the selected income.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name" className="text-foreground">
-                    Expense Name
+                    Income Name
                   </Label>
-                  <p>{expenseToView?.name}</p>
+                  <p>{incomeToView?.name}</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="frequency" className="text-foreground">
                     Frequency
                   </Label>
-                  <p>{enumToFrequency(expenseToView?.frequency)}</p>
+                  <p>{enumToFrequency(incomeToView?.frequency)}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -482,23 +449,17 @@ export function ExpenseTable() {
                   <Label htmlFor="amount" className="text-foreground">
                     Amount
                   </Label>
-                  <p>${expenseToView?.amount?.toFixed(2)}</p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="date" className="text-foreground">
-                    Date
-                  </Label>
-                  <p>{expenseToView?.date}</p>
+                  <p>${incomeToView?.amount.toFixed(2)}</p>
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="description" className="text-foreground">
                   Description
                 </Label>
-                <p>{expenseToView?.description}</p>
+                <p>{incomeToView?.description}</p>
               </div>
               <div className="flex justify-center gap-2">
-                <Button variant="outline" onClick={() => setIsExpenseDetailsDialogOpen(false)}>
+                <Button variant="outline" onClick={() => setIsIncomeDetailsDialogOpen(false)}>
                   Close
                 </Button>
               </div>

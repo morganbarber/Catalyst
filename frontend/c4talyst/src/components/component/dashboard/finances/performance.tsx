@@ -1,222 +1,207 @@
-"use client"
+"use client";
 
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
-import { CartesianGrid, XAxis, Area, AreaChart, Line, LineChart, YAxis } from "recharts"
-import { ChartTooltipContent, ChartTooltip, ChartContainer } from "@/components/ui/chart"
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import {
+  CartesianGrid,
+  XAxis,
+  Line,
+  LineChart,
+  YAxis,
+} from "recharts";
+import {
+  ChartTooltipContent,
+  ChartTooltip,
+  ChartContainer,
+} from "@/components/ui/chart";
 import { useCookies } from 'react-cookie';
+import { format, parseISO } from 'date-fns';
 
 export function Performance() {
-  const [expenses, setExpenses] = useState<{ id: number; name: string; frequency: string; amount: number; date: string; color: string; description: string; }[]>([]);
-  const [incomes, setIncomes] = useState<{ id: number; name: string; frequency: string; amount: number; color: string; description: string; }[]>([]);
+  const [expenses, setExpenses] = useState([]);
+  const [incomes, setIncomes] = useState([]);
   const [cookies, setCookie, removeCookie] = useCookies(['accessToken', 'refreshToken']);
-  const [performanceData, setPerformanceData] = useState<{ month: string; income: number; expense: number; gain: number }[]>([]);
+  const [chartData, setChartData] = useState([]);
 
-  const frequencyToEnum = (frequency: string) => {
-    switch (frequency) {
-      case 'Daily':
-        return "daily"
-      case 'Weekly':
-        return 'weekly'
-      case 'Monthly':
-        return 'monthly'
-      case 'Yearly':
-        return 'annually'
-      case 'One-time':
-        return 'one_time'
-      case 'Bi-Weekly':
-        return 'bi_weekly'
-      default:
-        return null
+  const fetchExpenseData = async () => {
+    try {
+      const response = await fetch("http://35.83.115.56/expense", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${cookies.accessToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      setExpenses(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
-  }
+  };
 
-  const enumToFrequency = (frequency: string) => {
-    switch (frequency) {
-      case 'daily':
-        return 'Daily'
-      case 'weekly':
-        return 'Weekly'
-      case 'monthly':
-        return 'Monthly'
-      case 'annually':
-        return 'Yearly'
-      case 'one_time':
-        return 'One-time'
-      case 'bi_weekly':
-        return 'Bi-Weekly'
-      default:
-        return null
+  const fetchIncomeData = async () => {
+    try {
+      const response = await fetch("http://35.83.115.56/income", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${cookies.accessToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      setIncomes(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
-  }
+  };
 
   useEffect(() => {
-    const fetchExpenseData = async () => {
-      try {
-        const response = await fetch('http://35.83.115.56/expense', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${cookies.accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        setExpenses(data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    const fetchIncomeData = async () => {
-      try {
-        const response = await fetch('http://35.83.115.56/income', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${cookies.accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        setIncomes(data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
     fetchExpenseData();
     fetchIncomeData();
   }, []);
 
   useEffect(() => {
-    const calculatePerformanceData = () => {
-      const months = ["January", "February", "March", "April", "May", "June"];
-      const data: { month: string; income: number; expense: number; gain: number }[] = [];
-      months.forEach((month) => {
-        let totalIncome = 0;
-        let totalExpense = 0;
-        incomes.forEach((income) => {
-          if (new Date(income.date).getMonth() + 1 === new Date(month).getMonth() + 1) {
-            totalIncome += income.amount;
-          }
+    const generateChartData = () => {
+      const today = new Date();
+      const pastDate = new Date(today.getFullYear(), today.getMonth() - 5, 1);
+      const dailyData = [];
+  
+      for (let d = new Date(pastDate); d <= today; d.setDate(d.getDate() + 1)) {
+        dailyData.push({
+          date: new Date(d),
+          expenses: 0,
+          incomes: 0,
         });
-        expenses.forEach((expense) => {
-          if (new Date(expense.date).getMonth() + 1 === new Date(month).getMonth() + 1) {
-            totalExpense += expense.amount;
+      }
+  
+      const findDailyData = (expenseDate) => {
+        return dailyData.find((d) => d.date.toISOString().split('T')[0] === expenseDate.toISOString().split('T')[0]);
+      };
+  
+      expenses.forEach((expense) => {
+        const expenseDate = new Date(expense.date);
+        const foundDay = findDailyData(expenseDate);
+        if (foundDay) {
+          switch (expense.frequency.toLowerCase()) {
+            case "daily":
+              foundDay.expenses += parseFloat(expense.amount);
+              break;
+            case "weekly":
+              if (expenseDate.getDay() === expenseDate.getUTCDay()) {
+                foundDay.expenses += parseFloat(expense.amount);
+              }
+              break;
+            case "monthly":
+              if (expenseDate.getDate() === 1) {
+                foundDay.expenses += parseFloat(expense.amount);
+              }
+              break;
+            case "one_time":
+              foundDay.expenses += parseFloat(expense.amount);
+              break;
+            default:
+              break;
           }
-        });
-        data.push({
-          month,
-          income: totalIncome,
-          expense: totalExpense,
-          gain: totalIncome - totalExpense,
+        }
+      });
+  
+      incomes.forEach((income) => {
+        dailyData.forEach((day) => {
+          const date = new Date(day.date);
+          switch (income.frequency.toLowerCase()) {
+            case "daily":
+              day.incomes += parseFloat(income.amount);
+              break;
+            case "weekly":
+              if (date.getDay() === date.getUTCDay()) {
+                day.incomes += parseFloat(income.amount);
+              }
+              break;
+            case "monthly":
+              if (date.getDate() === 1) {
+                day.incomes += parseFloat(income.amount);
+              }
+              break;
+            default:
+              break;
+          }
         });
       });
-      setPerformanceData(data);
+  
+      let cumulativeNetIncome = 0;
+  
+      const calculatedChartData = dailyData.map((item) => {
+        const netIncome = item.incomes - item.expenses;
+        cumulativeNetIncome += netIncome;
+        return {
+          date: item.date.toISOString().split('T')[0],
+          netIncome: cumulativeNetIncome,
+        };
+      });
+  
+      setChartData(calculatedChartData);
     };
-    calculatePerformanceData();
+  
+    generateChartData();
   }, [expenses, incomes]);
 
   return (
     <Card className="w-full max-w-4xl mx-auto">
       <CardHeader>
         <CardTitle>Financial Overview</CardTitle>
-        <CardDescription>A breakdown of your expenses and incomes over the last 6 months.</CardDescription>
+        <CardDescription>
+          A breakdown of your net income over the last 6 months.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-6">
-          <AreaChartStacked data={performanceData} className="aspect-[16/9]" /> {/* Pass performanceData here */}
+          <LineChartChart data={chartData} className="aspect-[16/9]" />
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-primary" />
-              <span>Expenses</span>
-              <div className="h-3 w-3 rounded-full bg-secondary" />
-              <span>Income</span>
-            </div>
-            <div className="flex items-center gap-2 text-2xl font-bold">
-              {/* TODO: Calculate and display financial health score */}
-              <span>8/10</span>
+              <div className="h-3 w-3 rounded-full bg-green-500" />
+              <span>Net Income</span>
             </div>
           </div>
-          <p className="text-muted-foreground">
-            {/* TODO: Display insightful financial advice based on the data */}
-            Your financial situation is looking good overall. You're managing your expenses well and your income is
-            steady. Keep up the great work!
-          </p>
+          <div className="flex items-center gap-2 text-2xl font-bold">
+              <StarIcon className="h-6 w-6 fill-primary" />
+              <span>8/10</span>
+            </div>
         </div>
+        <p className="text-muted-foreground">
+            Your financial situation is looking good overall. You&apos;re managing your expenses well and your income is
+            steady. Keep up the great work!
+        </p>
       </CardContent>
     </Card>
-  )
+  );
 }
 
-function AreaChartStacked(props: { data: { month: string; income: number; expense: number; gain: number }[]; className?: string }) {
-  return (
-    <div {...props}>
-      <ChartContainer
-        config={{
-          income: {
-            label: "Income",
-            color: "hsl(var(--chart-2))",
-          },
-          expense: {
-            label: "Expense",
-            color: "hsl(var(--chart-1))",
-          },
-        }}
-        className="min-h-[300px]"
-      >
-        <AreaChart
-          accessibilityLayer
-          data={props.data}
-          margin={{
-            left: 12,
-            right: 12,
-          }}
-        >
-          <CartesianGrid vertical={false} />
-          <XAxis
-            dataKey="month"
-            tickLine={false}
-            axisLine={false}
-            tickMargin={8}
-            tickFormatter={(value) => value.slice(0, 3)}
-          />
-          <YAxis
-            tickLine={false}
-            axisLine={false}
-            tickFormatter={(value) => `$${value.toFixed(0)}`}
-          />
-          <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
-          <Area
-            dataKey="expense"
-            type="natural"
-            fill="var(--color-expense)"
-            fillOpacity={0.4}
-            stroke="var(--color-expense)"
-            stackId="a"
-          />
-          <Area
-            dataKey="income"
-            type="natural"
-            fill="var(--color-income)"
-            fillOpacity={0.4}
-            stroke="var(--color-income)"
-            stackId="a"
-          />
-        </AreaChart>
-      </ChartContainer>
-    </div>
-  )
-}
+function LineChartChart({ data, className }) {
+  // Function to filter data points for the start of each month
+  const monthlyTickFormat = (data) => {
+    return data.filter((d, index) => {
+      const date = new Date(d.date);
+      // Check if the date is the first day of any month
+      return date.getDate() === 1;
+    }).map(d => d.date);
+  };
 
-function LinechartChart(props: React.HTMLAttributes<HTMLDivElement>) {
+  const monthlyTicks = monthlyTickFormat(data);
+
   return (
-    <div {...props}>
+    <div className={className}>
       <ChartContainer
         config={{
           desktop: {
@@ -224,38 +209,35 @@ function LinechartChart(props: React.HTMLAttributes<HTMLDivElement>) {
             color: "hsl(var(--chart-1))",
           },
         }}
+        className="min-h-[300px]"
       >
         <LineChart
-          accessibilityLayer
-          data={[
-            { month: "January", desktop: 186 },
-            { month: "February", desktop: 305 },
-            { month: "March", desktop: 237 },
-            { month: "April", desktop: 73 },
-            { month: "May", desktop: 209 },
-            { month: "June", desktop: 214 },
-          ]}
-          margin={{
-            left: 12,
-            right: 12,
-          }}
+          data={data}
+          margin={{ left: 12, right: 12, top: 20, bottom: 20 }}
         >
           <CartesianGrid vertical={false} />
           <XAxis
-            dataKey="month"
+            dataKey="date"
             tickLine={false}
             axisLine={false}
             tickMargin={8}
-            tickFormatter={(value) => value.slice(0, 3)}
+            ticks={monthlyTicks}
+            tickFormatter={(tick) => format(parseISO(tick), 'MMM')}
           />
-          <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-          <Line dataKey="desktop" type="natural" stroke="var(--color-desktop)" strokeWidth={2} dot={false} />
+          <YAxis tickLine={false} axisLine={false} tickMargin={8} />
+          <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
+          <Line
+            type="monotone"
+            dataKey="netIncome"
+            stroke="#34D399" // Tailwind green-500 color
+            strokeWidth={2}
+            dot={false}
+          />
         </LineChart>
       </ChartContainer>
     </div>
-  )
+  );
 }
-
 
 function StarIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -272,27 +254,6 @@ function StarIcon(props: React.SVGProps<SVGSVGElement>) {
       strokeLinejoin="round"
     >
       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-    </svg>
-  )
-}
-
-
-function XIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
     </svg>
   )
 }

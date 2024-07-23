@@ -11,11 +11,13 @@ export default function Page() {
         <PrivateRoute>
             <div style={{ overflowY: 'scroll', scrollbarWidth: 'none' }}>
                 <Dashboard>
-<ExpenseTable/>
-                    <div style={{ marginBottom: '4rem' }} />
-                    <IncomeTable/>
-                    <div style={{ marginBottom: '4rem' }} />
-                    <Performance/>
+                    <div style={{ overflowY: 'scroll', scrollbarWidth: 'none' }}>
+                        <ExpenseTable/>
+                        <div style={{ marginBottom: '4rem' }} />
+                        <IncomeTable/>
+                        <div style={{ marginBottom: '4rem' }} />
+                        <Performance/>
+                    </div>
                 </Dashboard>
             </div>
             <style jsx>{`

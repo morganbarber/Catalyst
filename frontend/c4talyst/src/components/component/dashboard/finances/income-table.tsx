@@ -186,7 +186,8 @@ export function IncomeTable() {
     setIsEditIncomeDialogOpen(false)
   }
 
-  const handleDeleteIncome = async (id: number) => {
+  const handleDeleteIncome = async (id: number, event) => {
+    event.stopPropagation();
     try {
       const response = await fetch('http://35.83.115.56/income/' + id, {
         method: 'DELETE',
@@ -204,12 +205,13 @@ export function IncomeTable() {
     setIncomes(Incomes.filter((income) => income.id !== id))
   }
 
-  const handleOpenEditIncomeDialog = (income: any) => {
+  const handleOpenEditIncomeDialog = (income, event) => {
     setIncomeToEdit(income)
     setIsEditIncomeDialogOpen(true)
+    setIsIncomeDetailsDialogOpen(false)
   }
 
-  const handleOpenIncomeDetailsDialog = (income) => {
+  const handleOpenIncomeDetailsDialog = (income: any) => {
     setIncomeToView(income)
     setIsIncomeDetailsDialogOpen(true)
   }
@@ -233,7 +235,7 @@ export function IncomeTable() {
             </TableHeader>
             <TableBody>
               {Incomes.map((income) => (
-                <TableRow key={income.id}>
+                <TableRow key={income.id} onClick={() => handleOpenIncomeDetailsDialog(income)}>
                   <TableCell className="flex items-center">
                     <div className={`w-4 h-4 rounded-full mr-2`} style={{ backgroundColor: income.color }} />
                     {income.name}
@@ -249,8 +251,8 @@ export function IncomeTable() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleOpenEditIncomeDialog(income)}>Edit</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDeleteIncome(income.id)}>Delete</DropdownMenuItem>
+                        <DropdownMenuItem onClick={(event) => handleOpenEditIncomeDialog(income, event)}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem onClick={(event) => handleDeleteIncome(income.id, event)}>Delete</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -424,14 +426,14 @@ export function IncomeTable() {
         <Dialog open={isIncomeDetailsDialogOpen} onOpenChange={setIsIncomeDetailsDialogOpen}>
           <DialogContent className="sm:max-w-md bg-background text-foreground">
             <DialogHeader>
-              <DialogTitle>income Details</DialogTitle>
+              <DialogTitle>Income Details</DialogTitle>
               <DialogDescription>View the details of the selected income.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name" className="text-foreground">
-                    income Name
+                    Income Name
                   </Label>
                   <p>{incomeToView?.name}</p>
                 </div>
@@ -448,12 +450,6 @@ export function IncomeTable() {
                     Amount
                   </Label>
                   <p>${incomeToView?.amount.toFixed(2)}</p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="date" className="text-foreground">
-                    Date
-                  </Label>
-                  <p>{incomeToView?.date}</p>
                 </div>
               </div>
               <div className="space-y-2">

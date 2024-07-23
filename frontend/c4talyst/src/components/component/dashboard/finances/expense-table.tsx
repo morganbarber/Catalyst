@@ -192,7 +192,8 @@ export function ExpenseTable() {
     setIsEditExpenseDialogOpen(false)
   }
 
-  const handleDeleteExpense = async (id: number) => {
+  const handleDeleteExpense = async (id: number, event) => {
+    event.stopPropagation();
     try {
       const response = await fetch('http://35.83.115.56/expense/' + id, {
         method: 'DELETE',
@@ -210,7 +211,8 @@ export function ExpenseTable() {
     setExpenses(expenses.filter((expense) => expense.id !== id))
   }
 
-  const handleOpenEditExpenseDialog = (expense: any) => {
+  const handleOpenEditExpenseDialog = (expense, event) => {
+    event.stopPropagation();
     setExpenseToEdit(expense)
     setIsEditExpenseDialogOpen(true)
     setIsExpenseDetailsDialogOpen(false)
@@ -258,8 +260,8 @@ export function ExpenseTable() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleOpenEditExpenseDialog(expense)}>Edit</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDeleteExpense(expense.id)}>Delete</DropdownMenuItem>
+                        <DropdownMenuItem onClick={(event) => handleOpenEditExpenseDialog(expense, event)}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem onClick={(event) => handleDeleteExpense(expense.id, event)}>Delete</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -383,8 +385,8 @@ export function ExpenseTable() {
                   </Label>
                   <Select
                     id="frequency"
-                    value={newExpense.frequency}
-                    onValueChange={(value) => setNewExpense({ ...newExpense, frequency: value })}
+                    value={expenseToEdit?.frequency || ""}
+                    onValueChange={(value) => setExpenseToEdit({ ...expenseToEdit, frequency: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select frequency" />
@@ -480,7 +482,7 @@ export function ExpenseTable() {
                   <Label htmlFor="amount" className="text-foreground">
                     Amount
                   </Label>
-                  <p>${expenseToView?.amount.toFixed(2)}</p>
+                  <p>${expenseToView?.amount?.toFixed(2)}</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="date" className="text-foreground">
@@ -507,4 +509,3 @@ export function ExpenseTable() {
     </Card>
   )
 }
-

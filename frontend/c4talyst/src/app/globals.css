@@ -67,3 +67,17 @@
     @apply bg-background text-foreground;
   }
 }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+.chat-container::-webkit-scrollbar {
+  display: none;
+}
+
+.chat-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

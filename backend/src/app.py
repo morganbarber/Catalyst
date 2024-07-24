@@ -5,7 +5,7 @@ from flask_jwt_extended import JWTManager, jwt_required
 from flask_sqlalchemy import SQLAlchemy
 from config import DevelopmentConfig, TestingConfig, ProductionConfig
 from models import User
-from blueprints import expense_bp, auth_bp, income_bp
+from blueprints import expense_bp, auth_bp, income_bp, llm_bp
 
 from models import db
 jwt = JWTManager()
@@ -47,6 +47,7 @@ def create_app(config_class=DevelopmentConfig):
     app.register_blueprint(auth_bp, url_prefix='/')
     app.register_blueprint(expense_bp, url_prefix='/')
     app.register_blueprint(income_bp, url_prefix='/')
+    app.register_blueprint(llm_bp, url_prefix='/llm')
 
     #  Error Handling for JWT
     @jwt.unauthorized_loader

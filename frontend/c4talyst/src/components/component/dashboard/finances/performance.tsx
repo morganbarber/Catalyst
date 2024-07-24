@@ -48,6 +48,30 @@ export function Performance() {
     }
   };
 
+  const fetchPerformanceData = async () => {
+    try {
+      const response = await fetch("http://35.83.115.56/llm/score_finances", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${cookies.accessToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      var score = data.score;
+      var reason = data.reason;
+
+      return { score, reason };
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const score_data = fetchPerformanceData();
+
   const fetchIncomeData = async () => {
     try {
       const response = await fetch("http://35.83.115.56/income", {
@@ -176,12 +200,11 @@ export function Performance() {
           </div>
           <div className="flex items-center gap-2 text-2xl font-bold">
               <StarIcon className="h-6 w-6 fill-primary" />
-              <span>8/10</span>
+              <span>{score_data.score}</span>
             </div>
         </div>
         <p className="text-muted-foreground">
-            Your financial situation is looking good overall. You&apos;re managing your expenses well and your income is
-            steady. Keep up the great work!
+            {score_data.reason}
         </p>
       </CardContent>
     </Card>

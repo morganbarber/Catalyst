@@ -10,7 +10,7 @@ export function Chat() {
       id: 1,
       sender: "Financial Advisor",
       content:
-        "Hello, what can I help you with?\n For your convenience, I will be granted access to any of your resources when relevant.",
+        "Hello, what can I help you with?<br/> For your convenience, I will be granted access to any of your resources when relevant.",
       timestamp: "2:30 PM",
     },
   ]);
@@ -27,6 +27,18 @@ export function Chat() {
         timestamp: new Date().toLocaleTimeString(),
       },
     ]);
+
+    try {
+      const response = fetch("http://35.83.115.56/llm/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ messages }),
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   // Scroll to the bottom whenever messages change

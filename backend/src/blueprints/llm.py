@@ -19,3 +19,14 @@ def score_finances():
         return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': 'Internal server error'})
+
+@jwt_required
+@llm_bp.route('/chat', methods=['POST'])
+def chat():
+    try:
+        response = llm_services.chat(request.get_json())
+        return jsonify(response), 200
+    except NotFound as e:
+        return jsonify({'error': str(e)}), 404
+    except Exception as e:
+        return jsonify({'error': 'Internal server error'})

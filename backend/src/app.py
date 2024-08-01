@@ -23,8 +23,7 @@ def create_app(config_class=DevelopmentConfig):
     Description:
         This function creates a Flask application with the specified configuration class. It initializes the Flask
         application and configures it with the specified configuration class. It also enables CORS for all origins,
-        initializes the SQLAlchemy database and JWTManager, and defines the routes for the signup, login, and refresh
-        endpoints. The function also sets up error handling for JWT.
+        initializes the SQLAlchemy database and JWTManager, and registers blueprints.
 
         The function also sets up error handling for JWT. The @jwt.unauthorized_loader decorator defines a handler
         for unauthorized requests, returning an error response with a status code of 401. The @jwt.expired_token_loader

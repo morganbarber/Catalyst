@@ -9,7 +9,7 @@ import { redirect } from 'next/navigation';
 import React, { useContext } from 'react';
 
 export function Login() {
-  const { login } = useContext(AuthContext);
+  const { login, isAuthenticated } = useContext(AuthContext);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -20,11 +20,15 @@ export function Login() {
 
     try {
       await login({ "email": email, "password": password, "username": username });
-      redirect('/');
+      return redirect('/dashboard');
     } catch (error) {
       // handle login error
     }
   };
+
+  if (isAuthenticated) {
+    return redirect('/dashboard');
+  }
 
   return (
     <div className="flex h-screen items-center justify-center">

@@ -40,36 +40,14 @@ class Services:
                     continue
 
         return response
-
     def chat(self, data):
-        messages = data["messages"]
-        commands = data["commands"]
-
-        if len(commands) > 0:
-            for command in commands:
-                if command == "finances":
-                    context += self.score_finances(sub=True)
-                    
+        messages = data["messages"]   
 
         context = "\n".join([f"{message['sender']}: {message['content']}" + "\n" for message in messages])
 
         response = self.client.inference(context=context, prompt="chat")
 
-        try:
-            assert response
-        except AssertionError:
-            while True:
-                response = self.client.inference(context=context, prompt="chat")
-                try:
-                    assert response
-                    break
-                except AssertionError:
-                    continue
+        return response
 
-        if "commands" in response[0]:
-            if response[0]["commands"] > 0:
-                return self.chat({"messages": response[0]["messages"], "commands": response[0]["commands"]})
-        if response[0]["commands"] > 0:
-            return self.chat({"messages": response[0]["messages"], "commands": response[0]["commands"]})
-        else:
-            return response
+    def debt_tips(self):
+        pass

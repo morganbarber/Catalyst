@@ -51,6 +51,7 @@ class Expense(db.Model):
     def __repr__(self):
         return f'<Expense {self.name} - {self.amount}>'
 
+
 class Debt(db.Model):
     __tablename__ = 'debt'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
@@ -66,7 +67,8 @@ class Debt(db.Model):
 
     def __repr__(self):
         return f'<Debt {self.name} - {self.amount}>'
-    
+
+
 class RepaymentPlan(db.Model):
     __tablename__ = 'repayment_plan'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
@@ -81,3 +83,57 @@ class RepaymentPlan(db.Model):
 
     def __repr__(self):
         return f'<RepaymentPlan {self.id} - {self.amount} - {self.status}>'
+
+
+class Investment(db.Model):
+    __tablename__ = 'investment'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    name = db.Column(db.String(100), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    risk_profile = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.Text)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def __repr__(self):
+        return f'<Investment {self.name} - {self.amount}>'
+
+
+class Portfolio(db.Model):
+    __tablename__ = 'portfolio'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    investments = db.relationship('Investment', backref='portfolio', lazy=True)
+
+    def __repr__(self):
+        return f'<Portfolio {self.name}>'
+
+
+class Budget(db.Model):
+    __tablename__ = 'budget'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    name = db.Column(db.String(100), nullable=False)
+    total_amount = db.Column(db.Float, nullable=False)
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=False)
+    description = db.Column(db.Text)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def __repr__(self):
+        return f'<Budget {self.name} - {self.total_amount}>'
+
+
+class Goal(db.Model):
+    __tablename__ = 'goal'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    target_amount = db.Column(db.Float, nullable=False)
+    current_amount = db.Column(db.Float, default=0.0)
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def __repr__(self):
+        return f'<Goal {self.name} - {self.target_amount} - {self.current_amount}>'

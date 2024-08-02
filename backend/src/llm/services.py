@@ -40,8 +40,9 @@ class Services:
                     continue
 
         return response
+
     def chat(self, data):
-        messages = data["messages"]   
+        messages = data["messages"]
 
         context = "\n".join([f"{message['sender']}: {message['content']}" + "\n" for message in messages])
 
@@ -49,5 +50,7 @@ class Services:
 
         return response
 
-    def debt_tips(self):
-        pass
+    def debt_tips(self, debt_data):
+        context = "\n".join([f"Debt: {debt['name']} - Amount: {debt['amount']}" for debt in debt_data])
+        response = self.client.inference(context=context, prompt="debt_tips")
+        return response

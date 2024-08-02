@@ -7,7 +7,7 @@ class UserSchema(Schema):
     username = fields.String(required=True, validate=[validate.Length(min=4, max=20), validate.Regexp(r'^[a-zA-Z0-9_]+$')])
     email = fields.Email(required=True)
     password = fields.String(required=True, load_only=True)
-    
+
     class Meta:
         fields = ("id", "username", "email", "password")
 
@@ -58,4 +58,50 @@ class RepaymentPlanSchema(Schema):
     user_id = fields.Integer(required=True)
 
     class Meta:
-        fields = ("id", "amount", "due_date", "status", "payment_date", "debt_id", "user_id")   
+        fields = ("id", "amount", "due_date", "status", "payment_date", "debt_id", "user_id")
+
+class InvestmentSchema(Schema):
+    id = fields.Integer(dump_only=True)
+    name = fields.String(required=True)
+    amount = fields.Float(required=True)
+    risk_profile = fields.String(required=True)
+    description = fields.String()
+    user_id = fields.Integer(dump_only=True)
+
+    class Meta:
+        fields = ("id", "name", "amount", "risk_profile", "description", "user_id")
+
+class PortfolioSchema(Schema):
+    id = fields.Integer(dump_only=True)
+    name = fields.String(required=True)
+    description = fields.String()
+    user_id = fields.Integer(dump_only=True)
+    investments = fields.Nested(InvestmentSchema, many=True)
+
+    class Meta:
+        fields = ("id", "name", "description", "user_id", "investments")
+
+class BudgetSchema(Schema):
+    id = fields.Integer(dump_only=True)
+    name = fields.String(required=True)
+    total_amount = fields.Float(required=True)
+    start_date = fields.Date(required=True)
+    end_date = fields.Date(required=True)
+    description = fields.String()
+    user_id = fields.Integer(dump_only=True)
+
+    class Meta:
+        fields = ("id", "name", "total_amount", "start_date", "end_date", "description", "user_id")
+
+class GoalSchema(Schema):
+    id = fields.Integer(dump_only=True)
+    name = fields.String(required=True)
+    description = fields.String()
+    target_amount = fields.Float(required=True)
+    current_amount = fields.Float(dump_only=True)
+    start_date = fields.Date(required=True)
+    end_date = fields.Date(required=True)
+    user_id = fields.Integer(dump_only=True)
+
+    class Meta:
+        fields = ("id", "name", "description", "target_amount", "current_amount", "start_date", "end_date", "user_id")

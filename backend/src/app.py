@@ -5,7 +5,7 @@ from flask_jwt_extended import JWTManager, jwt_required
 from flask_sqlalchemy import SQLAlchemy
 from config import DevelopmentConfig, TestingConfig, ProductionConfig
 from models import User
-from blueprints import expense_bp, auth_bp, income_bp, llm_bp
+from blueprints import expense_bp, auth_bp, income_bp, llm_bp, debt_bp, investment_bp, tax_bp, budget_bp, goal_bp  # Add goal_bp import
 
 from models import db
 jwt = JWTManager()
@@ -47,6 +47,11 @@ def create_app(config_class=DevelopmentConfig):
     app.register_blueprint(expense_bp, url_prefix='/')
     app.register_blueprint(income_bp, url_prefix='/')
     app.register_blueprint(llm_bp, url_prefix='/llm')
+    app.register_blueprint(debt_bp, url_prefix='/')
+    app.register_blueprint(investment_bp, url_prefix='/')
+    app.register_blueprint(tax_bp, url_prefix='/')
+    app.register_blueprint(budget_bp, url_prefix='/')
+    app.register_blueprint(goal_bp, url_prefix='/')
 
     #  Error Handling for JWT
     @jwt.unauthorized_loader
@@ -60,19 +65,19 @@ def create_app(config_class=DevelopmentConfig):
     @jwt.invalid_token_loader
     def handle_invalid_token(e=None):
         return jsonify({'error': 'Invalid token'}), 401
-    
+
     @app.errorhandler(404)
     def not_found(error=None):
         return make_response(jsonify({'error': '404 Not found'}), 404)
-    
+
     @app.errorhandler(500)
     def internal_server_error(error):
         return make_response(jsonify({'error': 'Internal server error'}), 500)
-    
+
     @app.errorhandler(400)
     def bad_request(error):
         return make_response(jsonify({'error': 'Bad request'}), 400)
-    
+
     with app.app_context():
         db.create_all()
 

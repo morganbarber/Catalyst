@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from enums import IncomeFrequency, ExpenseFrequency
+from enums import Frequency, RepaymentStatus
 
 db = SQLAlchemy()
 
@@ -42,7 +42,7 @@ class Expense(db.Model):
     name = db.Column(db.String(100), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     description = db.Column(db.Text)
-    frequency = db.Column(db.Enum(ExpenseFrequency), nullable=False)
+    frequency = db.Column(db.Enum(Frequency), nullable=False)
     color = db.Column(db.String(10))
     date = db.Column(db.Date)
 
@@ -50,3 +50,34 @@ class Expense(db.Model):
 
     def __repr__(self):
         return f'<Expense {self.name} - {self.amount}>'
+
+class Debt(db.Model):
+    __tablename__ = 'debt'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    name = db.Column(db.String(100), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    interest = db.Column(db.Float, nullable=False)
+    description = db.Column(db.Text)
+    color = db.Column(db.String(10))
+    date = db.Column(db.Date)
+    due_date = db.Column(db.Date)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def __repr__(self):
+        return f'<Debt {self.name} - {self.amount}>'
+    
+class RepaymentPlan(db.Model):
+    __tablename__ = 'repayment_plan'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    amount = db.Column(db.Float, nullable=False)
+    due_date = db.Column(db.Date, nullable=False)
+    status = db.Column(db.Enum(RepaymentStatus), default='Pending', nullable=False)
+    payment_date = db.Column(db.Date, nullable=True)
+
+    debt_id = db.Column(db.Integer, db.ForeignKey('debt.id'), nullable=False)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def __repr__(self):
+        return f'<RepaymentPlan {self.id} - {self.amount} - {self.status}>'

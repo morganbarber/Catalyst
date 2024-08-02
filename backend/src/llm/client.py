@@ -6,6 +6,14 @@ prompts = {
         "json": True,
         "prompt": "Based on the provided incomes and expenses, give the user a score x.x/10. Give a reason why. If it's not 10, explain to the user how they could make it a 10. Use 2 keys in the JSON, one for the score and one for the reason. Label them 'score' and 'reason'. \n Here is the data:",
     },
+    "chat": {
+        "json": True,
+        "prompt": "Please provide your response in a 'response' key.\nHere is the context:\n\n",
+    },
+    "debt_tips": {
+        "json": True,
+        "prompt": "Please provide your 3 tips based on the users debt information in the keys: '1', '2', and '3'. Use 3 keys in the JSON, one for each tip .\nHere is the context:\n\n",
+    },
 }
 
 class client:

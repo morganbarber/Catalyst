@@ -207,7 +207,7 @@ export function Debt() {
   )
 }
 
-function CreditCardIcon(props) {
+function CreditCardIcon(props: any) {
   return (
     <svg
       {...props}
@@ -228,7 +228,7 @@ function CreditCardIcon(props) {
 }
 
 
-function DollarSignIcon(props) {
+function DollarSignIcon(props: any) {
   return (
     <svg
       {...props}
@@ -249,7 +249,7 @@ function DollarSignIcon(props) {
 }
 
 
-function HomeIcon(props) {
+function HomeIcon(props: any) {
   return (
     <svg
       {...props}
@@ -270,7 +270,7 @@ function HomeIcon(props) {
 }
 
 
-function LightbulbIcon(props) {
+function LightbulbIcon(props: any) {
   return (
     <svg
       {...props}
@@ -292,7 +292,7 @@ function LightbulbIcon(props) {
 }
 
 
-function ShieldCheckIcon(props) {
+function ShieldCheckIcon(props: any) {
   return (
     <svg
       {...props}
@@ -313,7 +313,7 @@ function ShieldCheckIcon(props) {
 }
 
 
-function WalletIcon(props) {
+function WalletIcon(props: any) {
   return (
     <svg
       {...props}
@@ -334,7 +334,7 @@ function WalletIcon(props) {
 }
 
 
-function XIcon(props) {
+function XIcon(props: any) {
   return (
     <svg
       {...props}

@@ -1,7 +1,7 @@
 # src/services/tax_service.py
 
 from flask_jwt_extended import get_jwt_identity
-from models.tax import Tax, db
+from models import Tax, db
 from schemas.tax import TaxSchema
 from werkzeug.exceptions import BadRequest, NotFound
 from flask import jsonify

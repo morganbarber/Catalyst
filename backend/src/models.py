@@ -106,6 +106,7 @@ class Portfolio(db.Model):
     description = db.Column(db.Text)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     investments = db.relationship('Investment', backref='portfolio', lazy=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __repr__(self):
         return f'<Portfolio {self.name}>'

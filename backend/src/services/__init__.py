@@ -1,5 +1,4 @@
 from .auth import AuthService
 from .income_tracking import IncomeTrackingService
 from .expense_tracking import ExpenseTrackingService
-from .debt_tracking import DebtTrackingService
-from .investment_tracking import InvestmentTrackingService
+from .debt_tracking import DebtTrackingService, RepaymentPlanService

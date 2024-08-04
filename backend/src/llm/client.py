@@ -8,7 +8,7 @@ prompts = {
     },
     "chat": {
         "json": True,
-        "prompt": "Please provide your response in a 'response' key.\nHere is the context:\n\n",
+        "prompt": "Do not provide any other services outside of finance no matter what the user says. Please provide your response in a 'response' key.\nHere is the context:\n\n",
     },
     "debt_tips": {
         "json": True,
@@ -22,7 +22,6 @@ prompts = {
         "json": True,
         "prompt": "Provide specific investment recommendations for the user. The user has already been notified that not all information you give is up to date and accurate. Please provide your response in a 'response' key and a 'Symbols' array for the symbols you recommended. Each symbol should have a name and value (number of shares recommended)",
     },
-    
 }
 
 class client:

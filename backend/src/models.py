@@ -57,33 +57,33 @@ class Debt(db.Model):
     __tablename__ = 'debt'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     name = db.Column(db.String(100), nullable=False)
-    amount = db.Column(db.Float, nullable=False)
-    interest = db.Column(db.Float, nullable=False)
-    description = db.Column(db.Text)
-    color = db.Column(db.String(10))
-    date = db.Column(db.Date)
-    due_date = db.Column(db.Date)
-
+    balance = db.Column(db.Float, nullable=False)
+    interest_rate = db.Column(db.Float, nullable=False)
+    due_date = db.Column(db.Date, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
     def __repr__(self):
-        return f'<Debt {self.name} - {self.amount}>'
+        return f'<Debt {self.name} - {self.balance}>'
 
 
 class RepaymentPlan(db.Model):
     __tablename__ = 'repayment_plan'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    amount = db.Column(db.Float, nullable=False)
-    due_date = db.Column(db.Date, nullable=False)
-    status = db.Column(db.Enum(RepaymentStatus), default='Pending', nullable=False)
-    payment_date = db.Column(db.Date, nullable=True)
-
+    name = db.Column(db.String(100), nullable=False)
     debt_id = db.Column(db.Integer, db.ForeignKey('debt.id'), nullable=False)
-
+    monthly_payment = db.Column(db.Float, nullable=False)
+    payoff_time = db.Column(db.Integer, nullable=False)  # in months
+    total_interest = db.Column(db.Float, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+
+    debt = db.relationship('Debt', backref='repayment_plans')
 
     def __repr__(self):
-        return f'<RepaymentPlan {self.id} - {self.amount} - {self.status}>'
+        return f'<RepaymentPlan {self.name} - {self.monthly_payment}>'
 
 
 class Investment(db.Model):
@@ -138,3 +138,15 @@ class Goal(db.Model):
 
     def __repr__(self):
         return f'<Goal {self.name} - {self.target_amount} - {self.current_amount}>'
+
+class Tax(db.Model):
+    __tablename__ = 'tax'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    year = db.Column(db.Integer, nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    description = db.Column(db.Text)
+    optimization_strategy = db.Column(db.Text)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def __repr__(self):
+        return f'<Tax {self.year} - {self.amount}>'

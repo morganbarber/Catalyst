@@ -26,25 +26,14 @@ class Services:
 
         response = self.client.inference(context=context, prompt="score_finances")
 
-        try:
-            assert response[0]["score"]
-            assert response[0]["reason"]
-        except AssertionError:
-            while True:
-                response = self.client.inference(context=context, prompt="score_finances")
-                try:
-                    assert response[0]["score"]
-                    assert response[0]["reason"]
-                    break
-                except AssertionError:
-                    continue
-
         return response
 
     def chat(self, data):
         messages = data["messages"]
 
-        context = "\n".join([f"{message['sender']}: {message['content']}" + "\n" for message in messages])
+        context += self.score_finances(sub=True)
+
+        context += "\n".join([f"{message['sender']}: {message['content']}" + "\n" for message in messages])
 
         response = self.client.inference(context=context, prompt="chat")
 

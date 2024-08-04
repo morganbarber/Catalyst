@@ -3,11 +3,11 @@ from flask_jwt_extended import jwt_required
 from llm import client, services
 from werkzeug.exceptions import NotFound, BadRequest
 
-from llm import services
+from llm import Services
 
 llm_bp = Blueprint('llm', __name__)
 llm_client = client()
-llm_services = services(llm_client)
+llm_services = Services(llm_client)
     
 @jwt_required()
 @llm_bp.route('/score_finances', methods=['GET'])

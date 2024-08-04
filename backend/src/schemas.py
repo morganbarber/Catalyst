@@ -1,6 +1,6 @@
 from marshmallow import Schema, fields, validate
 
-from enums import IncomeFrequency, ExpenseFrequency
+from enums import Frequency, RepaymentStatus, RiskProfile
 
 class UserSchema(Schema):
     id = fields.Integer(dump_only=True)
@@ -17,7 +17,7 @@ class IncomeSchema(Schema):
     name = fields.String(required=True)
     amount = fields.Float(required=True)
     description = fields.String()
-    frequency = fields.Enum(enum=IncomeFrequency, required=True)
+    frequency = fields.Enum(enum=Frequency, required=True)
 
     class Meta:
         fields = ("id", "user_id", "name", "amount", "color", "description", "frequency", "date")
@@ -27,7 +27,7 @@ class ExpenseSchema(Schema):
     user_id = fields.Integer(dump_only=True)
     name = fields.String(required=True)
     description = fields.String()
-    frequency = fields.Enum(enum=ExpenseFrequency, required=True)
+    frequency = fields.Enum(enum=Frequency, required=True)
     color = fields.String()
     date = fields.Date()
     amount = fields.Float(required=True)

@@ -1,10 +1,16 @@
 import Link from "next/link"
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 
 export function LandingPage() {
   return (
     <div className="flex flex-col min-h-[100dvh]">
       <header className="px-4 lg:px-6 h-14 flex items-center">
         <Link href="#" className="flex items-center justify-center" prefetch={false}>
+          <CogIcon className="h-6 w-6" />
           <span className="sr-only">C4TALYST</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
@@ -25,9 +31,9 @@ export function LandingPage() {
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6">
-            <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
-              <div className="flex flex-col justify-center space-y-4">
-                <div className="space-y-2">
+            <div className="flex flex-col items-center justify-center gap-6 lg:grid lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
+              <div className="flex flex-col items-center justify-center space-y-4">
+                <div className="space-y-2 text-center">
                   <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
                     Manage Your Finances with C4TALYST
                   </h1>
@@ -53,17 +59,10 @@ export function LandingPage() {
                   </Link>
                 </div>
               </div>
-              <img
-                src="/placeholder.svg"
-                width="550"
-                height="550"
-                alt="Hero"
-                className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last lg:aspect-square"
-              />
             </div>
           </div>
         </section>
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-muted" style={{width: "100%"}}>
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
           <div className="container px-4 md:px-6">
             <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
               <div className="flex flex-col items-center justify-center space-y-2">
@@ -100,6 +99,100 @@ export function LandingPage() {
         <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
             <div className="space-y-3">
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Pricing</h2>
+              <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                Choose the plan that best fits your needs.
+              </p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+              <Card className="p-6 space-y-4 border rounded-lg shadow-sm">
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-bold">Basic</h3>
+                  <p className="text-4xl font-bold">$9/mo</p>
+                  <p className="text-muted-foreground">Ideal for individuals</p>
+                </div>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li className="flex items-center gap-2">
+                    <CheckIcon className="w-5 h-5 text-primary" />
+                    Tax Preparation
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckIcon className="w-5 h-5 text-primary" />
+                    Budgeting
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckIcon className="w-5 h-5 text-primary" />
+                    Savings Goals
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <XIcon className="w-5 h-5 text-muted-foreground" />
+                    Investing
+                  </li>
+                </ul>
+                <Button className="w-full">Get Started</Button>
+              </Card>
+              <Card className="p-6 space-y-4 border rounded-lg shadow-sm">
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-bold">Premium</h3>
+                  <p className="text-4xl font-bold">$19/mo</p>
+                  <p className="text-muted-foreground">Ideal for families</p>
+                </div>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li className="flex items-center gap-2">
+                    <CheckIcon className="w-5 h-5 text-primary" />
+                    Tax Preparation
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckIcon className="w-5 h-5 text-primary" />
+                    Budgeting
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckIcon className="w-5 h-5 text-primary" />
+                    Savings Goals
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckIcon className="w-5 h-5 text-primary" />
+                    Investing
+                  </li>
+                </ul>
+                <Button className="w-full">Get Started</Button>
+              </Card>
+              <Card className="p-6 space-y-4 border rounded-lg shadow-sm">
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-bold">Enterprise</h3>
+                  <p className="text-4xl font-bold">$49/mo</p>
+                  <p className="text-muted-foreground">Ideal for businesses</p>
+                </div>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li className="flex items-center gap-2">
+                    <CheckIcon className="w-5 h-5 text-primary" />
+                    Tax Preparation
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckIcon className="w-5 h-5 text-primary" />
+                    Budgeting
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckIcon className="w-5 h-5 text-primary" />
+                    Savings Goals
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckIcon className="w-5 h-5 text-primary" />
+                    Investing
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckIcon className="w-5 h-5 text-primary" />
+                    Custom Reporting
+                  </li>
+                </ul>
+                <Button className="w-full">Get Started</Button>
+              </Card>
+            </div>
+          </div>
+        </section>
+        <section className="w-full py-12 md:py-24 lg:py-32">
+          <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
+            <div className="space-y-3">
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
                 Take Control of Your Finances with C4TALYST
               </h2>
@@ -126,15 +219,38 @@ export function LandingPage() {
             </div>
           </div>
         </section>
+        <section className="w-full py-12 md:py-24 lg:py-32">
+          <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
+            <div className="space-y-3">
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Contact Us</h2>
+              <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                Get in touch with our team for more information or support.
+              </p>
+            </div>
+            <div className="w-full max-w-md">
+              <form className="space-y-5">
+                <div className="grid gap-2">
+                  <Input id="name" placeholder="Name" />
+                </div>
+                <div className="grid gap-2">
+                  <Input id="email" type="email" placeholder="Email" />
+                </div>
+                <div className="grid gap-2">
+                  <Textarea id="message" placeholder="Messagee" className="min-h-[150px]" />
+                </div>
+                <Button type="submit" className="w-full">
+                  Submit
+                </Button>
+              </form>
+            </div>
+          </div>
+        </section>
       </main>
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
         <p className="text-xs text-muted-foreground">&copy; 2024 C4TALYST. All rights reserved.</p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <Link href="#" className="text-xs hover:underline underline-offset-4" prefetch={false}>
+          <Link href="/tos" className="text-xs hover:underline underline-offset-4" prefetch={false}>
             Terms of Service
-          </Link>
-          <Link href="#" className="text-xs hover:underline underline-offset-4" prefetch={false}>
-            Privacy
           </Link>
         </nav>
       </footer>
@@ -142,8 +258,60 @@ export function LandingPage() {
   )
 }
 
+function CheckIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  )
+}
 
-function CurrencyIcon(props: React.SVGProps<SVGSVGElement>) {
+
+function CogIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z" />
+      <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
+      <path d="M12 2v2" />
+      <path d="M12 22v-2" />
+      <path d="m17 20.66-1-1.73" />
+      <path d="M11 10.27 7 3.34" />
+      <path d="m20.66 17-1.73-1" />
+      <path d="m3.34 7 1.73 1" />
+      <path d="M14 12h8" />
+      <path d="M2 12h2" />
+      <path d="m20.66 7-1.73 1" />
+      <path d="m3.34 17 1.73-1" />
+      <path d="m17 3.34-1 1.73" />
+      <path d="m11 13.73-4 6.93" />
+    </svg>
+  )
+}
+
+
+function CurrencyIcon(props) {
   return (
     <svg
       {...props}
@@ -167,7 +335,7 @@ function CurrencyIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 
-function ImportIcon(props: React.SVGProps<SVGSVGElement>) {
+function ImportIcon(props) {
   return (
     <svg
       {...props}
@@ -189,7 +357,7 @@ function ImportIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 
-function PocketIcon(props: React.SVGProps<SVGSVGElement>) {
+function PocketIcon(props) {
   return (
     <svg
       {...props}
@@ -210,7 +378,7 @@ function PocketIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 
-function SaveIcon(props: React.SVGProps<SVGSVGElement>) {
+function SaveIcon(props) {
   return (
     <svg
       {...props}
@@ -232,7 +400,7 @@ function SaveIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 
-function XIcon(props: React.SVGProps<SVGSVGElement>) {
+function XIcon(props) {
   return (
     <svg
       {...props}

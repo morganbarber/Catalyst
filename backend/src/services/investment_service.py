@@ -1,6 +1,6 @@
 # src/services/investment_service.py
 
-from models import Investment, Portfolio, db
+from models import Investment, Portfolio, User, db
 from schemas import InvestmentSchema, PortfolioSchema
 from flask_jwt_extended import get_jwt_identity
 from werkzeug.exceptions import BadRequest, NotFound
@@ -19,7 +19,8 @@ class InvestmentService:
         user_id = get_jwt_identity()
         # Fetch user risk profile and other relevant data
         # For simplicity, let's assume risk_profile is fetched from user data
-        risk_profile = "moderate"  # This should be dynamic based on the user
+        user = User.query.get(user_id)
+        risk_profile = user.risk_profile
         context = f"User with risk profile: {risk_profile}"
         response = client.inference(context=context, prompt="investment_recommendations")
         return response

@@ -12,3 +12,8 @@ class RepaymentStatus(Enum):
     pending = 'pending'
     completed = 'completed'
     failed = 'failed'
+
+class RiskProfile(Enum):
+    low = 'low'
+    medium = 'medium'
+    high = 'high'

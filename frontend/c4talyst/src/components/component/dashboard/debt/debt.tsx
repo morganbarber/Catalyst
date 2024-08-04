@@ -4,207 +4,198 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import axios from "axios";
+
 export function Debt() {
-  return (
-    <div className="flex flex-col h-screen">
-      <main className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
-        <section className="bg-card rounded-lg shadow-lg p-6 flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold">Debt Tracking</h2>
-            <Button size="sm">Add Debt</Button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Total Debt</CardTitle>
-              </CardHeader>
-              <CardContent className="text-4xl font-bold">$25,432</CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Payments Due</CardTitle>
-              </CardHeader>
-              <CardContent className="text-4xl font-bold">$1,234</CardContent>
-            </Card>
-          </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Creditor</TableHead>
-                <TableHead>Balance</TableHead>
-                <TableHead>Interest</TableHead>
-                <TableHead>Due Date</TableHead>
-                <TableHead />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell>Chase Credit Card</TableCell>
-                <TableCell>$5,432</TableCell>
-                <TableCell>18.99%</TableCell>
-                <TableCell>05/15/2023</TableCell>
-                <TableCell>
-                  <Button variant="outline" size="sm">
-                    View
-                  </Button>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Citi Bank Loan</TableCell>
-                <TableCell>$12,000</TableCell>
-                <TableCell>9.75%</TableCell>
-                <TableCell>06/30/2023</TableCell>
-                <TableCell>
-                  <Button variant="outline" size="sm">
-                    View
-                  </Button>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Amex Credit Card</TableCell>
-                <TableCell>$8,000</TableCell>
-                <TableCell>22.99%</TableCell>
-                <TableCell>07/01/2023</TableCell>
-                <TableCell>
-                  <Button variant="outline" size="sm">
-                    View
-                  </Button>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </section>
-        <section className="bg-card rounded-lg shadow-lg p-6 flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold">Repayment Plans</h2>
-            <Button size="sm">Create Plan</Button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Optimal Plan</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <span>Monthly Payment</span>
-                  <span className="font-bold">$1,234</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Payoff Time</span>
-                  <span className="font-bold">18 months</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Total Interest</span>
-                  <span className="font-bold">$2,345</span>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button>Start Plan</Button>
-              </CardFooter>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Custom Plan</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <span>Monthly Payment</span>
-                  <Input type="number" className="w-24" />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Payoff Time</span>
-                  <Input type="number" className="w-24" />
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button>Save Plan</Button>
-              </CardFooter>
-            </Card>
-          </div>
-        </section>
-        <section className="bg-card rounded-lg shadow-lg p-6 flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold">Debt Advice</h2>
-            <Button size="sm">View Resources</Button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Debt Management Tips</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-2">
-                <div className="flex items-start gap-2">
-                  <LightbulbIcon className="h-6 w-6 text-primary" />
-                  <div>
-                    <h3 className="font-semibold">Prioritize High-Interest Debts</h3>
-                    <p className="text-muted-foreground">
-                      Focus on paying off debts with the highest interest rates first to save on interest charges.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <WalletIcon className="h-6 w-6 text-primary" />
-                  <div>
-                    <h3 className="font-semibold">Create a Debt Repayment Plan</h3>
-                    <p className="text-muted-foreground">
-                      Develop a structured plan to pay off your debts, including setting realistic payment goals.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <ShieldCheckIcon className="h-6 w-6 text-primary" />
-                  <div>
-                    <h3 className="font-semibold">Improve Your Credit Score</h3>
-                    <p className="text-muted-foreground">
-                      Adopt strategies to build and maintain a good credit score, which can help you access better
-                      financing options.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Debt Consolidation Options</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-2">
-                <div className="flex items-start gap-2">
-                  <CreditCardIcon className="h-6 w-6 text-primary" />
-                  <div>
-                    <h3 className="font-semibold">Balance Transfer Cards</h3>
-                    <p className="text-muted-foreground">
-                      Explore balance transfer credit cards that offer low or 0% APR for a promotional period, allowing
-                      you to consolidate and pay off your debts.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <DollarSignIcon className="h-6 w-6 text-primary" />
-                  <div>
-                    <h3 className="font-semibold">Debt Consolidation Loans</h3>
-                    <p className="text-muted-foreground">
-                      Consider taking out a debt consolidation loan to combine multiple debts into a single,
-                      lower-interest payment.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <HomeIcon className="h-6 w-6 text-primary" />
-                  <div>
-                    <h3 className="font-semibold">Home Equity Loans</h3>
-                    <p className="text-muted-foreground">
-                      If you own a home, you may be able to use the equity to secure a loan with a lower interest rate
-                      to pay off your debts.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-      </main>
-    </div>
-  )
+	const [debt, setDebt] = useState({ total: 0, paymentsDue: 0, creditors: [] });
+	const [optimalPlan, setOptimalPlan] = useState({});
+	const [tips, setTips] = useState([]);
+
+	useEffect(() => {
+		const fetchDebts = async () => {
+			try {
+				const debtResponse = await axios.get("/api/debts", { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
+				const optimalPlanResponse = await axios.get("/api/repayment-plans/optimization", { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
+				const tipsResponse = await axios.get("/api/tips");
+				
+				setDebt(debtResponse.data);
+				setOptimalPlan(optimalPlanResponse.data);
+				setTips(tipsResponse.data);
+			} catch (error) {
+				console.error("Error fetching data:", error);
+			}
+		};
+
+		fetchDebts();
+	}, []);
+
+	return (
+		<div className="flex flex-col h-screen">
+			<main className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
+				<section className="bg-card rounded-lg shadow-lg p-6 flex flex-col gap-4">
+					<div className="flex items-center justify-between">
+						<h2 className="text-2xl font-semibold">Debt Tracking</h2>
+						<Button size="sm">Add Debt</Button>
+					</div>
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<Card>
+							<CardHeader>
+								<CardTitle>Total Debt</CardTitle>
+							</CardHeader>
+							<CardContent className="text-4xl font-bold">${debt.total}</CardContent>
+						</Card>
+						<Card>
+							<CardHeader>
+								<CardTitle>Payments Due</CardTitle>
+							</CardHeader>
+							<CardContent className="text-4xl font-bold">${debt.paymentsDue}</CardContent>
+						</Card>
+					</div>
+					<Table>
+						<TableHeader>
+							<TableRow>
+								<TableHead>Creditor</TableHead>
+								<TableHead>Balance</TableHead>
+								<TableHead>Interest</TableHead>
+								<TableHead>Due Date</TableHead>
+								<TableHead />
+							</TableRow>
+						</TableHeader>
+						<TableBody>
+							{debt.creditors.map((creditor, index) => (
+								<TableRow key={index}>
+									<TableCell>{creditor.name}</TableCell>
+									<TableCell>${creditor.balance}</TableCell>
+									<TableCell>{creditor.interest}%</TableCell>
+									<TableCell>{creditor.dueDate}</TableCell>
+									<TableCell>
+										<Link href={`/debt/${index}`}>
+											<a className="text-primary">View Details</a>
+										</Link>
+									</TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
+				</section>
+				<section className="bg-card rounded-lg shadow-lg p-6 flex flex-col gap-4">
+					<div className="flex items-center justify-between">
+						<h2 className="text-2xl font-semibold">Repayment Plans</h2>
+						<Button size="sm">Create Plan</Button>
+					</div>
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<Card>
+							<CardHeader>
+								<CardTitle>Optimal Plan</CardTitle>
+							</CardHeader>
+							<CardContent className="flex flex-col gap-2">
+								<div className="flex items-center justify-between">
+									<span>Monthly Payment</span>
+									<span className="font-bold">${optimalPlan.monthlyPayment}</span>
+								</div>
+								<div className="flex items-center justify-between">
+									<span>Payoff Time</span>
+									<span className="font-bold">{optimalPlan.payoffTime} months</span>
+								</div>
+								<div className="flex items-center justify-between">
+									<span>Total Interest</span>
+									<span className="font-bold">${optimalPlan.totalInterest}</span>
+								</div>
+							</CardContent>
+							<CardFooter>
+								<Button>Start Plan</Button>
+							</CardFooter>
+						</Card>
+						<Card>
+							<CardHeader>
+								<CardTitle>Custom Plan</CardTitle>
+							</CardHeader>
+							<CardContent className="flex flex-col gap-2">
+								<div className="flex items-center justify-between">
+									<span>Monthly Payment</span>
+									<Input type="number" className="w-24" />
+								</div>
+								<div className="flex items-center justify-between">
+									<span>Payoff Time</span>
+									<Input type="number" className="w-24" />
+								</div>
+							</CardContent>
+							<CardFooter>
+								<Button>Save Plan</Button>
+							</CardFooter>
+						</Card>
+					</div>
+				</section>
+				<section className="bg-card rounded-lg shadow-lg p-6 flex flex-col gap-4">
+					<div className="flex items-center justify-between">
+						<h2 className="text-2xl font-semibold">Debt Advice</h2>
+						<Button size="sm">View Resources</Button>
+					</div>
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<Card>
+							<CardHeader>
+								<CardTitle>Debt Management Tips</CardTitle>
+							</CardHeader>
+							<CardContent className="flex flex-col gap-2">
+								{tips.map((tip, index) => (
+									<div key={index} className="flex items-start gap-2">
+										<LightbulbIcon className="h-6 w-6 text-primary" />
+										<div>
+											<h3 className="font-semibold">{tip.title}</h3>
+											<p className="text-muted-foreground">{tip.description}</p>
+										</div>
+									</div>
+								))}
+							</CardContent>
+						</Card>
+						<Card>
+							<CardHeader>
+								<CardTitle>Debt Consolidation Options</CardTitle>
+							</CardHeader>
+							<CardContent className="flex flex-col gap-2">
+								<div className="flex items-start gap-2">
+									<CreditCardIcon className="h-6 w-6 text-primary" />
+									<div>
+										<h3 className="font-semibold">Balance Transfer Cards</h3>
+										<p className="text-muted-foreground">
+											Explore balance transfer credit cards that offer low or 0% APR for a promotional period, allowing
+											you to consolidate and pay off your debts.
+										</p>
+									</div>
+								</div>
+								<div className="flex items-start gap-2">
+									<DollarSignIcon className="h-6 w-6 text-primary" />
+									<div>
+										<h3 className="font-semibold">Debt Consolidation Loans</h3>
+										<p className="text-muted-foreground">
+											Consider taking out a debt consolidation loan to combine multiple debts into a single,
+											lower-interest payment.
+										</p>
+									</div>
+								</div>
+								<div className="flex items-start gap-2">
+									<HomeIcon className="h-6 w-6 text-primary" />
+									<div>
+										<h3 className="font-semibold">Home Equity Loans</h3>
+										<p className="text-muted-foreground">
+											If you own a home, you may be able to use the equity to secure a loan with a lower interest rate
+											to pay off your debts.
+										</p>
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+					</div>
+				</section>
+			</main>
+		</div>
+	);
 }
 
 function CreditCardIcon(props: any) {

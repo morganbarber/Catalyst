@@ -14,6 +14,15 @@ prompts = {
         "json": True,
         "prompt": "Please provide your 3 tips based on the users debt information in the keys: '1', '2', and '3'. Use 3 keys in the JSON, one for each tip .\nHere is the context:\n\n",
     },
+    "tax_optimization": {
+        "json": True,
+        "prompt": "Provide optimization for the user's taxes. Please provide your response in a 'response' key.\nHere is the context:\n\n",
+    },
+    "investment_recommendations": {
+        "json": True,
+        "prompt": "Provide specific investment recommendations for the user. The user has already been notified that not all information you give is up to date and accurate. Please provide your response in a 'response' key and a 'Symbols' array for the symbols you recommended. Each symbol should have a name and value (number of shares recommended)",
+    },
+    
 }
 
 class client:

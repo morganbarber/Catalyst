@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from enums import Frequency, RepaymentStatus
+from enums import Frequency, RepaymentStatus, RiskProfile
 
 db = SQLAlchemy()
 
@@ -13,6 +13,7 @@ class User(db.Model):
     password_hash = db.Column(db.String())
     incomes = db.relationship('Income', backref='user')
     expenses = db.relationship('Expense', backref='user', lazy='dynamic')
+    risk_profile = db.Column(db.Enum(RiskProfile), nullable=False)
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
@@ -27,7 +28,7 @@ class Income(db.Model):
     name = db.Column(db.String(100), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     description = db.Column(db.Text)
-    frequency = db.Column(db.Enum(IncomeFrequency), nullable=False)
+    frequency = db.Column(db.Enum(Frequency), nullable=False)
     color = db.Column(db.String(10))
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

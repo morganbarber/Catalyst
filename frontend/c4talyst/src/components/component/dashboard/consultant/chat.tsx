@@ -1,10 +1,13 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useCookies } from "react-cookie";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export function Chat() {
+  const [cookies, setCookie, removeCookie] = useCookies(['accessToken', 'refreshToken']);
+
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -18,6 +21,8 @@ export function Chat() {
   const chatContainerRef = useRef(null);
 
   const handleSendMessage = (message) => {
+    if (message === "") return;
+
     setMessages([
       ...messages,
       {
@@ -33,6 +38,7 @@ export function Chat() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${cookies.accessToken}`,
         },
         body: JSON.stringify({ messages }),
       });

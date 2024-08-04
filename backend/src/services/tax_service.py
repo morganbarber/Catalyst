@@ -2,7 +2,7 @@
 
 from flask_jwt_extended import get_jwt_identity
 from models import Tax, db
-from schemas.tax import TaxSchema
+from schemas import TaxSchema
 from werkzeug.exceptions import BadRequest, NotFound
 from flask import jsonify
 from llm.client import client

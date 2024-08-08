@@ -106,7 +106,6 @@ class Portfolio(db.Model):
     description = db.Column(db.Text)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     investments = db.relationship('Investment', backref='portfolio', lazy=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __repr__(self):
         return f'<Portfolio {self.name}>'
@@ -121,6 +120,12 @@ class Budget(db.Model):
     end_date = db.Column(db.Date, nullable=False)
     description = db.Column(db.Text)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    emergency_fund = db.Column(db.Float)
+    discretionary_spending = db.Column(db.Float)
+    remaining_budget = db.Column(db.Float)
+    total_income = db.Column(db.Float)
+    total_expense = db.Column(db.Float)
+    total_investment = db.Column(db.Float)
 
     def __repr__(self):
         return f'<Budget {self.name} - {self.total_amount}>'
@@ -139,6 +144,7 @@ class Goal(db.Model):
 
     def __repr__(self):
         return f'<Goal {self.name} - {self.target_amount} - {self.current_amount}>'
+
 
 class Tax(db.Model):
     __tablename__ = 'tax'

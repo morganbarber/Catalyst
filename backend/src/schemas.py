@@ -89,9 +89,15 @@ class BudgetSchema(Schema):
     end_date = fields.Date(required=True)
     description = fields.String()
     user_id = fields.Integer(dump_only=True)
+    emergency_fund = fields.Float()
+    discretionary_spending = fields.Float()
+    remaining_budget = fields.Float()
+    total_income = fields.Float()
+    total_expense = fields.Float()
+    total_investment = fields.Float()
 
     class Meta:
-        fields = ("id", "name", "total_amount", "start_date", "end_date", "description", "user_id")
+        fields = ("id", "name", "total_amount", "start_date", "end_date", "description", "user_id", "emergency_fund", "discretionary_spending", "remaining_budget", "total_income", "total_expense", "total_investment")
 
 class GoalSchema(Schema):
     id = fields.Integer(dump_only=True)

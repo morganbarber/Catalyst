@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useCookies } from "react-cookie";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { set } from "date-fns";
 
 export function Chat() {
   const [cookies, setCookie, removeCookie] = useCookies(['accessToken', 'refreshToken']);
@@ -13,7 +14,7 @@ export function Chat() {
       id: 1,
       sender: "Financial Advisor",
       content:
-        "Hello, what can I help you with?<br/> For your convenience, I will be granted access to any of your resources when relevant.",
+        "Hello, what can I help you with? For your convenience, I will be granted access to any of your resources when relevant.",
       timestamp: "2:30 PM",
     },
   ]);
@@ -22,16 +23,6 @@ export function Chat() {
 
   const handleSendMessage = (message) => {
     if (message === "") return;
-
-    setMessages([
-      ...messages,
-      {
-        id: messages.length + 1,
-        sender: "You",
-        content: message,
-        timestamp: new Date().toLocaleTimeString(),
-      },
-    ]);
 
     try {
       const response = fetch("http://35.83.115.56/llm/chat", {
@@ -42,6 +33,22 @@ export function Chat() {
         },
         body: JSON.stringify({ messages }),
       });
+
+      setMessages([
+        ...messages,
+        {
+          id: messages.length + 1,
+          sender: "You",
+          content: message,
+          timestamp: new Date().toLocaleTimeString(),
+        },
+        {
+          id: messages.length + 1,
+          sender: "Financial Advisor",
+          content: "test",
+          timestamp: new Date().toLocaleTimeString(),
+        },
+      ]);
     } catch (error) {
       console.error(error);
     }

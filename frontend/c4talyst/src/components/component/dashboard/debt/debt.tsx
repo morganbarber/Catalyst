@@ -3,13 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
-
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
 import axios from "axios";
 
 export function Debt() {
@@ -19,17 +13,25 @@ export function Debt() {
 
 	useEffect(() => {
 		const fetchDebts = async () => {
-			try {
-				const debtResponse = await axios.get("/api/debts", { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
-				const optimalPlanResponse = await axios.get("/api/repayment-plans/optimization", { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
-				const tipsResponse = await axios.get("/api/tips");
-				
-				setDebt(debtResponse.data);
-				setOptimalPlan(optimalPlanResponse.data);
-				setTips(tipsResponse.data);
-			} catch (error) {
-				console.error("Error fetching data:", error);
-			}
+		try {
+			const token = localStorage.getItem("token");
+			const headers = { Authorization: `Bearer ${token}` };
+
+			const debtResponse = await axios.get("/api/debts", { headers });
+			const optimalPlanResponse = await axios.get(
+			"/api/repayment-plans/optimization",
+			{ headers }
+			);
+			// Assuming /api/tips doesn't require authentication
+			const tipsResponse = await axios.get("/api/tips");
+
+			setDebt(debtResponse.data);
+			setOptimalPlan(optimalPlanResponse.data);
+			setTips(tipsResponse.data);
+		} catch (error) {
+			console.error("Error fetching data:", error);
+			// Handle error, maybe display error message to user
+		}
 		};
 
 		fetchDebts();
@@ -38,51 +40,56 @@ export function Debt() {
 	return (
 		<div className="flex flex-col h-screen">
 			<main className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
-				<section className="bg-card rounded-lg shadow-lg p-6 flex flex-col gap-4">
-					<div className="flex items-center justify-between">
-						<h2 className="text-2xl font-semibold">Debt Tracking</h2>
-						<Button size="sm">Add Debt</Button>
-					</div>
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-						<Card>
-							<CardHeader>
-								<CardTitle>Total Debt</CardTitle>
-							</CardHeader>
-							<CardContent className="text-4xl font-bold">${debt.total}</CardContent>
-						</Card>
-						<Card>
-							<CardHeader>
-								<CardTitle>Payments Due</CardTitle>
-							</CardHeader>
-							<CardContent className="text-4xl font-bold">${debt.paymentsDue}</CardContent>
-						</Card>
-					</div>
-					<Table>
-						<TableHeader>
-							<TableRow>
-								<TableHead>Creditor</TableHead>
-								<TableHead>Balance</TableHead>
-								<TableHead>Interest</TableHead>
-								<TableHead>Due Date</TableHead>
-								<TableHead />
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{debt.creditors.map((creditor, index) => (
-								<TableRow key={index}>
-									<TableCell>{creditor.name}</TableCell>
-									<TableCell>${creditor.balance}</TableCell>
-									<TableCell>{creditor.interest}%</TableCell>
-									<TableCell>{creditor.dueDate}</TableCell>
-									<TableCell>
-										<Link href={`/debt/${index}`}>
-											<a className="text-primary">View Details</a>
-										</Link>
-									</TableCell>
-								</TableRow>
-							))}
-						</TableBody>
-					</Table>
+			<section className="bg-card rounded-lg shadow-lg p-6 flex flex-col gap-4">
+				<div className="flex items-center justify-between">
+					<h2 className="text-2xl font-semibold">Debt Tracking</h2>
+					<Button size="sm">Add Debt</Button>
+				</div>
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<Card>
+					<CardHeader>
+						<CardTitle>Total Debt</CardTitle>
+					</CardHeader>
+					<CardContent className="text-4xl font-bold">
+						${debt.total}
+					</CardContent>
+					</Card>
+					<Card>
+					<CardHeader>
+						<CardTitle>Payments Due</CardTitle>
+					</CardHeader>
+					<CardContent className="text-4xl font-bold">
+						${debt.paymentsDue}
+					</CardContent>
+					</Card>
+				</div>
+				<Table>
+					<TableHeader>
+					<TableRow>
+						<TableHead>Creditor</TableHead>
+						<TableHead>Balance</TableHead>
+						<TableHead>Interest</TableHead>
+						<TableHead>Due Date</TableHead>
+						<TableHead />
+					</TableRow>
+					</TableHeader>
+					<TableBody>
+					{debt.creditors.map((creditor, index) => (
+						<TableRow key={index}>
+						<TableCell>{creditor.name}</TableCell>
+						<TableCell>${creditor.balance}</TableCell>
+						<TableCell>{creditor.interest}%</TableCell>
+						<TableCell>{creditor.dueDate}</TableCell>
+						<TableCell>
+							<Link href={`/debt/${creditor.id}`}> 
+							{/* Assuming creditor object has an id property */}
+							<a className="text-primary">View Details</a>
+							</Link>
+						</TableCell>
+						</TableRow>
+					))}
+					</TableBody>
+				</Table>
 				</section>
 				<section className="bg-card rounded-lg shadow-lg p-6 flex flex-col gap-4">
 					<div className="flex items-center justify-between">

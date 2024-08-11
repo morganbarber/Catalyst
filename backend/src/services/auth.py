@@ -32,7 +32,8 @@ class AuthService:
         user = User(
             username=user_data['username'],
             email=user_data['email'],
-            password_hash=generate_password_hash(user_data['password'])
+            password_hash=generate_password_hash(user_data['password']),
+            risk_profile='medium'
         )
         db.session.add(user)
         db.session.commit()

@@ -120,12 +120,12 @@ export default function Dashboard({children}: {children: React.ReactNode}) {
               Debt
             </Link>
             <Link
-              href="/dashboard/insurance"
+              href="/dashboard/investing"
               className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
               prefetch={false}
             >
               <ShieldIcon className="h-5 w-5" />
-              Insurance
+              Investing
             </Link>
             <Link
               href="#"

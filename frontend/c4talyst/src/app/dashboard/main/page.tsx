@@ -8,7 +8,7 @@ export default function Home() {
     return (
         <PrivateRoute>
             <Dashboard>
-                a
+                <b>To get started, select a page from the sidebar.</b>
             </Dashboard>
         </PrivateRoute>
     )

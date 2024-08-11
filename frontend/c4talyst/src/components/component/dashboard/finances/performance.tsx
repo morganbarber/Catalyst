@@ -28,6 +28,8 @@ export function Performance() {
   const [incomes, setIncomes] = useState([]);
   const [cookies, setCookie, removeCookie] = useCookies(['accessToken', 'refreshToken']);
   const [chartData, setChartData] = useState([]);
+  const [score, setScore] = useState(0);
+  const [reason, setReason] = useState("");
 
   const fetchExpenseData = async () => {
     try {
@@ -61,16 +63,15 @@ export function Performance() {
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
-      var score = data.score;
-      var reason = data.reason;
+      const { score, reason } = data;
+      setScore(score);
+      setReason(reason);
 
       return { score, reason };
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-
-  const score_data = fetchPerformanceData();
 
   const fetchIncomeData = async () => {
     try {
@@ -94,6 +95,7 @@ export function Performance() {
   useEffect(() => {
     fetchExpenseData();
     fetchIncomeData();
+    fetchPerformanceData();
   }, []);
 
   useEffect(() => {
@@ -200,11 +202,11 @@ export function Performance() {
           </div>
           <div className="flex items-center gap-2 text-2xl font-bold">
               <StarIcon className="h-6 w-6 fill-primary" />
-              <span>{score_data.score}</span>
+              <span>{score}</span>
             </div>
         </div>
         <p className="text-muted-foreground">
-            {score_data.reason}
+            {reason}
         </p>
       </CardContent>
     </Card>

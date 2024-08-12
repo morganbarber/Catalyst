@@ -42,13 +42,9 @@ class BaseService:
         if not record:
             raise NotFound(f'{model.__name__} not found')
 
-        errors = schema.validate(data)
-        if errors:
-            print(errors)
-            raise BadRequest(errors)
-
         for key, value in data.items():
-            setattr(record, key, value)
+            if value is not None:
+                setattr(record, key, value)
 
         db.session.commit()
 

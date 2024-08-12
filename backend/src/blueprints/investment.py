@@ -166,6 +166,7 @@ def get_portfolio_historical_data():
     except NotFound as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
+        print(e)
         return jsonify({'error': 'Internal server error'}), 500
     
 @investment_bp.route('/stocks/<symbol>', methods=['GET'])

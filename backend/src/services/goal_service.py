@@ -25,8 +25,6 @@ class GoalService:
             description=goal_data.get('description'),
             current_amount=goal_data['current_amount'],
             target_amount=goal_data['target_amount'],
-            start_date=goal_data['start_date'],
-            end_date=goal_data['end_date']
         )
         db.session.add(goal)
         db.session.commit()
@@ -70,8 +68,7 @@ class GoalService:
         goal.name = goal_data.get('name', goal.name)
         goal.description = goal_data.get('description', goal.description)
         goal.target_amount = goal_data.get('target_amount', goal.target_amount)
-        goal.start_date = goal_data.get('start_date', goal.start_date)
-        goal.end_date = goal_data.get('end_date', goal.end_date)
+        goal.current_amount = goal_data.get('current_amount', goal.current_amount)
 
         db.session.commit()
         logging.info(f"Goal updated successfully: {goal}")
@@ -91,7 +88,7 @@ class GoalService:
         db.session.commit()
         logging.info(f"Goal deleted successfully: {goal_id}")
 
-        return jsonify({'message': 'Goal deleted successfully'})
+        return {'message': 'Goal deleted successfully'}
 
     @staticmethod
     @jwt_required()

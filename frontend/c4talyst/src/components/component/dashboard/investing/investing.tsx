@@ -756,6 +756,8 @@ function ChartAreaChart(props: { portfolios: Portfolio[] }) {
                     Authorization: `Bearer ${cookies.accessToken}`,
                 },
             }).then((response) => response.json());
+
+            console.log(portfolioData);
             
             const formattedData: ChartData[] = [];
             for (let i = 0; i < 6; i++) {

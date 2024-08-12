@@ -59,36 +59,18 @@ export function Login() {
               Sign In
             </Button>
           </div>
-          <div className="text-center text-sm">
-            <Link href="#" className="underline underline-offset-4" prefetch={false}>
-              Forgot your password?
-            </Link>
-          </div>
         </form>
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or sign in with</span>
-            </div>
-          </div>
-          <div className="grid gap-4">
-            <Button variant="outline" className="w-full">
-              <GithubIcon className="mr-2 h-4 w-4" />
-              Sign in with GitHub
-            </Button>
-            <Button variant="outline" className="w-full">
-              <ChromeIcon className="mr-2 h-4 w-4" />
-              Sign in with Google
-            </Button>
-          </div>
           <p className="text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link href="/signup" className="underline underline-offset-4">
               Sign up now
             </Link>
           </p>
+        </div>
         </div>
       </div>
     </div>

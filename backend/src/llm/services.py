@@ -1,5 +1,8 @@
 from services.expense_tracking import ExpenseTrackingService
 from services.income_tracking import IncomeTrackingService
+from services.budget_service import BudgetService
+from services.investment_service import InvestmentService
+from services.goal_service import GoalService
 
 class Services:
     def __init__(self, client):
@@ -22,12 +25,21 @@ class Services:
 
         response = self.client.inference(context=context, prompt="score_finances")
 
-        return response
+        return responses
 
     def chat(self, data):
         messages = data["messages"]
 
         context = self.score_finances(sub=True)
+
+        budget = BudgetService.get_budgets().first()
+        if budget:
+            context += f"\n\nBudget: {budget['name']} - Discretionary Spending: {budget['discretionary_spending']} - Emergency Fund: {budget['emergency_fund']}\n Investment Fund: {budget['investment_fund']} - Goal Fund: {budget['goal_fund']}"
+
+        investments = InvestmentService.get_investments()
+        if investments:
+            investments_info = "\n".join([f"Investment: {investment['name']} - Amount: {investment['amount']}" for investment in investments])
+            context += f"\n\nInvestments:\n{investments_info}"
 
         context += "\n\n".join([f"{message['sender']}: {message['content']}" + "\n" for message in messages])
 

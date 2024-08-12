@@ -35,10 +35,10 @@ class BudgetService:
 
             discretionary_spending = total_income * 0.20
 
-            remaining_budget = total_income - (total_expense + total_goal_amount + total_investment + emergency_fund + discretionary_spending)
-
             investing_fund = remaining_budget * 0.50
             goal_fund = remaining_budget * 0.50
+
+            remaining_budget = total_income - (total_expense + total_goal_amount + emergency_fund + discretionary_spending + goal_fund + investing_fund)
 
             budget = Budget(
                 user_id=user_id,

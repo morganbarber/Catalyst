@@ -156,3 +156,15 @@ def portfolio_adjustments():
         return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': 'Internal server error'}), 500
+
+@investment_bp.route('/portfolio/historical', methods=['GET'])
+@jwt_required()
+def get_portfolio_historical_data():
+    try:
+        portfolio_id = request.args.get('portfolio_id')
+        response = PortfolioService.get_portfolio_historical_data(portfolio_id)
+        return jsonify(response), 200
+    except NotFound as e:
+        return jsonify({'error': str(e)}), 404
+    except Exception as e:
+        return jsonify({'error': 'Internal server error'}), 500

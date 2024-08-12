@@ -6,6 +6,8 @@ from flask_jwt_extended import get_jwt_identity
 from werkzeug.exceptions import BadRequest, NotFound
 from llm.client import client
 from flask import jsonify
+import yfinance as yf
+from datetime import date, timedelta
 
 investment_schema = InvestmentSchema()
 investments_schema = InvestmentSchema(many=True)
@@ -90,6 +92,10 @@ class PortfolioService:
         errors = portfolio_schema.validate(data)
         if errors:
             raise BadRequest(errors)
+        
+        # validate that name is a ticker
+        if not yf.Ticker(data['name']).info:
+            raise BadRequest('Invalid ticker')
 
         portfolio = Portfolio(user_id=user_id, **data)
         db.session.add(portfolio)
@@ -162,3 +168,31 @@ class PortfolioService:
         context = "\n".join([f"Portfolio: {portfolio.name} - Description: {portfolio.description}" for portfolio in portfolios])
         response = client.inference(context=context, prompt="portfolio_adjustments")
         return jsonify(response)
+    
+    @staticmethod
+    def get_portfolio_historical_data(portfolio_id):
+        user_id = get_jwt_identity()
+        portfolio = Portfolio.query.filter_by(id=portfolio_id, user_id=user_id).first()
+        if not portfolio:
+            raise NotFound('Portfolio not found')
+
+        investments = Investment.query.filter_by(portfolio_id=portfolio_id).all()
+        historical_data = {}
+
+        today = date.today()
+        start_dates = [(today - timedelta(days=30 * i)).replace(day=1) for i in range(1, 7)]
+
+        for investment in investments:
+            ticker_data = {}
+            ticker = yf.Ticker(investment.name)
+
+            for i, start_date in enumerate(start_dates):
+                end_date = (start_date + timedelta(days=30)).replace(day=1) - timedelta(days=1)
+                # Fetch data only if it's not the current month (to avoid incomplete data)
+                if end_date < today:
+                    data = ticker.history(start=start_date, end=end_date)
+                    ticker_data[start_date.strftime('%Y-%m')] = data['Close'].tolist()
+            
+            historical_data[investment.name] = ticker_data
+
+        return jsonify(historical_data)

@@ -198,6 +198,7 @@ class PortfolioService:
     
     @staticmethod
     def get_stock_price_at_date(symbol, date=None):
+        symbol = symbol[1:] if symbol.startswith('$') else symbol
         if date is None:
             date = date.today()
         try:

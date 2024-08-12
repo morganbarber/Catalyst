@@ -203,5 +203,6 @@ class PortfolioService:
             stock = yf.Ticker(symbol)
         except Exception as e:
             return jsonify({'error': 'Invalid symbol'}), 400
-        data = stock.info['regularMarketPrice']
-        return jsonify({'price': data})
+        print(stock.info['currentPrice'])
+        data = stock.info['currentPrice']
+        return data

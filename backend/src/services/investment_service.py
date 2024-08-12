@@ -33,6 +33,11 @@ class InvestmentService:
         errors = investment_schema.validate(data)
         if errors:
             raise BadRequest(errors)
+        
+        # validate name is symbol
+        ticker = yf.Ticker(data['name'])
+        if not ticker.info:
+            raise BadRequest({'name': 'Invalid symbol'})
 
         investment = Investment(user_id=user_id, **data)
         db.session.add(investment)
@@ -92,10 +97,6 @@ class PortfolioService:
         errors = portfolio_schema.validate(data)
         if errors:
             raise BadRequest(errors)
-        
-        # validate that name is a ticker
-        if not yf.Ticker(data['name']).info:
-            raise BadRequest('Invalid ticker')
 
         portfolio = Portfolio(user_id=user_id, **data)
         db.session.add(portfolio)

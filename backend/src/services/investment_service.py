@@ -8,6 +8,7 @@ from llm.client import client
 from flask import jsonify
 import yfinance as yf
 from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta
 
 investment_schema = InvestmentSchema()
 investments_schema = InvestmentSchema(many=True)
@@ -188,7 +189,8 @@ class PortfolioService:
         for portfolio in portfolios:
             for investment in investments:
                 if investment.portfolio_id == portfolio.id:
-                    recent_data = yf.download(investment.name, start=today - timedelta(months=6), end=today)
+                    
+                    recent_data = yf.download(investment.name, start=today - relativedelta(months=6), end=today)
                     print(recent_data['Close'].values.tolist())
                     historical_data[portfolio.name][investment.name] = recent_data['Close'].values.tolist()
 

@@ -187,10 +187,8 @@ class PortfolioService:
         for portfolio in portfolios:
             for investment in investments:
                 if investment.portfolio_id == portfolio.id:
-                    # get price 6 months ago, 5 months ago, 4 months ago, 3 months ago, 2 months ago, 1 month ago
                     recent_data = yf.download(investment.name, start=today - timedelta(days=30), end=today)
-                    print(recent_data)
-                    historical_data[portfolio.name] = recent_data['Close'].values.tolist()
+                    historical_data[portfolio.name] = recent_data['Close'].values.tolist() * investment.amount
 
         return historical_data
     

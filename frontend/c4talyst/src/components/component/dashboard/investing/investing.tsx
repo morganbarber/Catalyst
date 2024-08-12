@@ -282,10 +282,10 @@ export default function Component() {
     }
   };
 
-  const handleUpdateInvestment = async (updatedInvestment) => {
+  const handleUpdateInvestment = async (updatedInvestment, id) => {
     try {
       const response = await fetch(
-        `${baseUrl}/investments/${updatedInvestment.id}`,
+        `${baseUrl}/investments/${id}`,
         {
           method: "PUT",
           headers: {
@@ -312,17 +312,17 @@ export default function Component() {
     }
   };
 
-  const handleUpdatePortfolio = async (updatedPortfolio) => {
+  const handleUpdatePortfolio = async (updatedPortfolio, id) => {
     try {
       const response = await fetch(
-        `${baseUrl}/portfolios/${updatedPortfolio.id}`,
+        `${baseUrl}/portfolios/${id}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${cookies.accessToken}`,
           },
-          body: JSON.stringify(updatedPortfolio.filter((key) => key !== "id")),
+          body: JSON.stringify(updatedPortfolio),
         }
       );
 
@@ -660,13 +660,12 @@ export default function Component() {
                 type="submit"
                 onClick={() =>
                   handleUpdateInvestment({
-                    id: editingInvestment.id,
                     name: document.getElementById("editInvestmentName").value,
                     amount: parseFloat(
                       document.getElementById("editInvestmentAmount").value
                     ),
-                    portfolio_id: selectedPortfolioId,
-                  })
+                    portfolio_id: selectedPortfolioId ?? editingInvestment.portfolio_id,
+                  }, editingInvestment.id)
                 }
               >
                 Save Changes
@@ -712,9 +711,8 @@ export default function Component() {
                 type="submit"
                 onClick={() =>
                   handleUpdatePortfolio({
-                    id: editingPortfolio.id,
                     name: document.getElementById("editPortfolioName").value,
-                  })
+                  }, editingPortfolio.id)
                 }
               >
                 Save Changes

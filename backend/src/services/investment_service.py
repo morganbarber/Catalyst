@@ -193,7 +193,7 @@ class PortfolioService:
                         historical_prices.append(price)
                     historical_data[investment.name] = historical_prices
 
-        return jsonify(historical_data)
+        return historical_data
     
     @staticmethod
     def get_stock_price(symbol):

@@ -124,6 +124,8 @@ class Budget(db.Model):
     total_income = db.Column(db.Float)
     total_expense = db.Column(db.Float)
     total_investment = db.Column(db.Float)
+    investment_fund = db.Column(db.Float)
+    goal_fund = db.Column(db.Float)
 
     def __repr__(self):
         return f'<Budget {self.name} - {self.total_amount}>'

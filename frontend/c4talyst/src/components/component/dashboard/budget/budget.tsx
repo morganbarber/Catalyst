@@ -41,6 +41,8 @@ export function Budget() {
   const [cookies, setCookie] = useCookies();
   const [goals, setGoals] = useState([]);
   const [showCreateGoalDialog, setShowCreateGoalDialog] = useState(false);
+  const [showEditGoalDialog, setShowEditGoalDialog] = useState(false);
+  const [editingGoal, setEditingGoal] = useState(null);
 
   useEffect(() => {
     const fetchBudgetData = async () => {
@@ -144,8 +146,39 @@ export function Budget() {
       }
 
       const newGoal = await response.json();
-      setGoals([...goals, newGoal]); 
-      setShowCreateGoalDialog(false); 
+      setGoals([...goals, newGoal]);
+      setShowCreateGoalDialog(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleEditGoal = async (updatedGoalData, id) => {
+    try {
+      const response = await fetch(
+        `http://35.83.115.56:80/goals/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookies.accessToken}`,
+          },
+          body: JSON.stringify(updatedGoalData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update goal");
+      }
+
+      const updatedGoal = await response.json();
+      setGoals(
+        goals.map((goal) =>
+          goal.id === updatedGoal.id ? updatedGoal : goal
+        )
+      );
+      setShowEditGoalDialog(false);
+      setEditingGoal(null);
     } catch (err) {
       console.error(err);
     }
@@ -183,11 +216,14 @@ export function Budget() {
                 </TableHeader>
                 <TableBody>
                   <TableRow>
-                    <TableCell className="font-medium">Discretionary</TableCell>
+                    <TableCell className="font-medium">
+                      Discretionary
+                    </TableCell>
                     <TableCell>${budget.discretionary_spending}</TableCell>
                     <TableCell>
                       {(
-                        (budget.discretionary_spending / budget.total_income) *
+                        (budget.discretionary_spending /
+                          budget.total_income) *
                         100
                       ).toFixed(2)}
                       %
@@ -199,10 +235,27 @@ export function Budget() {
                     </TableCell>
                     <TableCell>${budget.emergency_fund}</TableCell>
                     <TableCell>
-                      {(
-                        (budget.emergency_fund / budget.total_income) *
-                        100
-                      ).toFixed(2)}
+                      {((budget.emergency_fund / budget.total_income) * 100).toFixed(
+                        2
+                      )}
+                      %
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="font-medium">Investment</TableCell>
+                    <TableCell>${budget.investment_fund}</TableCell>
+                    <TableCell>
+                      {((budget.investment_fund / budget.total_income) * 100).toFixed(
+                        2
+                      )}
+                      %
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="font-medium">Goal fund</TableCell>
+                    <TableCell>${budget.goal_fund}</TableCell>
+                    <TableCell>
+                      {((budget.goal_fund / budget.total_income) * 100).toFixed(2)}
                       %
                     </TableCell>
                   </TableRow>
@@ -237,24 +290,35 @@ export function Budget() {
                         <div className="relative h-2 w-full rounded-full bg-muted">
                           <div
                             className="absolute left-0 top-0 h-full rounded-full bg-primary"
-                            style={{ width: `${(goal.current_amount / goal.target_amount) * 100}%` }} 
+                            style={{
+                              width: `${
+                                (goal.current_amount / goal.target_amount) * 100
+                              }%`,
+                            }}
                           />
                         </div>
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                            >
-                              <div className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
-                            </Button>
+                          <Button
+                                variant="ghost"
+                                size="icon"
+                                className="rounded-full border w-8 h-8"
+                              >
+                                <div className="h-4 w-4" />
+                                <span className="sr-only">Toggle menu</span>
+                              </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setEditingGoal(goal);
+                                setShowEditGoalDialog(true);
+                              }}
+                            >
+                              Edit
+                            </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => handleDeleteGoal(goal.id)}
                             >
@@ -346,6 +410,82 @@ export function Budget() {
             <Button
               variant="outline"
               onClick={() => setShowCreateGoalDialog(false)}
+            >
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Goal Dialog */}
+      <Dialog
+        open={showEditGoalDialog}
+        onOpenChange={setShowEditGoalDialog}
+      >
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Goal</DialogTitle>
+            <DialogDescription>
+              Modify the details of your goal.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid items-center grid-cols-4 gap-4">
+              <Label htmlFor="editGoalName" className="text-right">
+                Name
+              </Label>
+              <Input
+                id="editGoalName"
+                defaultValue={editingGoal ? editingGoal.name : ""}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid items-center grid-cols-4 gap-4">
+              <Label htmlFor="editGoalCurrentAmount" className="text-right">
+                Current Amount
+              </Label>
+              <Input
+                id="editGoalCurrentAmount"
+                defaultValue={editingGoal ? editingGoal.current_amount : ""}
+                className="col-span-3"
+                type="number"
+              />
+            </div>
+            <div className="grid items-center grid-cols-4 gap-4">
+              <Label htmlFor="editGoalTargetAmount" className="text-right">
+                Target Amount
+              </Label>
+              <Input
+                id="editGoalTargetAmount"
+                defaultValue={editingGoal ? editingGoal.target_amount : ""}
+                className="col-span-3"
+                type="number"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              type="submit"
+              onClick={() => {
+                handleEditGoal({
+                  name: document.getElementById("editGoalName").value,
+                  target_amount: parseFloat(
+                    document.getElementById("editGoalTargetAmount").value
+                  ),
+                  current_amount: parseFloat(
+                    document.getElementById("editGoalCurrentAmount").value
+                  ),
+                }, editingGoal.id);
+              }}
+            >
+              Save Changes
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowEditGoalDialog(false);
+                setEditingGoal(null);
+              }}
             >
               Cancel
             </Button>

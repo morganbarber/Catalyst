@@ -93,9 +93,11 @@ class BudgetSchema(Schema):
     total_income = fields.Float()
     total_expense = fields.Float()
     total_investment = fields.Float()
+    investment_fund = fields.Float()
+    goal_fund = fields.Float()
 
     class Meta:
-        fields = ("id", "name", "description", "user_id", "emergency_fund", "discretionary_spending", "remaining_budget", "total_income", "total_expense", "total_investment")
+        fields = ("id", "name", "description", "user_id", "emergency_fund", "discretionary_spending", "remaining_budget", "total_income", "total_expense", "total_investment", "investment_fund", "goal_fund")
 
 class GoalSchema(Schema):
     id = fields.Integer(dump_only=True)

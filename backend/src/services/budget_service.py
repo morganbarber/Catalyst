@@ -37,6 +37,9 @@ class BudgetService:
 
             remaining_budget = total_income - (total_expense + total_goal_amount + total_investment + emergency_fund + discretionary_spending)
 
+            investing_fund = remaining_budget * 0.50
+            goal_fund = remaining_budget * 0.50
+
             budget = Budget(
                 user_id=user_id,
                 name=budget_data['name'],
@@ -47,7 +50,9 @@ class BudgetService:
                 remaining_budget=remaining_budget,
                 total_income=total_income,
                 total_expense=total_expense,
-                total_investment=total_investment
+                total_investment=total_investment,
+                investment_fund=investing_fund,
+                goal_fund=goal_fund
             )
             db.session.add(budget)
             db.session.commit()

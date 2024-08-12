@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { redirect } from "next/navigation"
 
 export function LandingPage() {
   return (
@@ -108,7 +109,7 @@ export function LandingPage() {
               <Card className="p-6 space-y-4 border rounded-lg shadow-sm">
                 <div className="space-y-2">
                   <h3 className="text-2xl font-bold">Basic</h3>
-                  <p className="text-4xl font-bold">$9/mo</p>
+                  <p className="text-4xl font-bold">$FREE/mo</p>
                   <p className="text-muted-foreground">Ideal for individuals</p>
                 </div>
                 <ul className="space-y-2 text-muted-foreground">
@@ -129,12 +130,12 @@ export function LandingPage() {
                     Investing
                   </li>
                 </ul>
-                <Button className="w-full">Get Started</Button>
+                <Button className="w-full" onClick={redirect('/signup')}>Get Started</Button>
               </Card>
               <Card className="p-6 space-y-4 border rounded-lg shadow-sm">
                 <div className="space-y-2">
                   <h3 className="text-2xl font-bold">Premium</h3>
-                  <p className="text-4xl font-bold">$19/mo</p>
+                  <p className="text-4xl font-bold">$FREE/mo</p>
                   <p className="text-muted-foreground">Ideal for families</p>
                 </div>
                 <ul className="space-y-2 text-muted-foreground">
@@ -155,12 +156,12 @@ export function LandingPage() {
                     Investing
                   </li>
                 </ul>
-                <Button className="w-full">Get Started</Button>
+                <Button className="w-full" onClick={redirect('/signup')}>Get Started</Button>
               </Card>
               <Card className="p-6 space-y-4 border rounded-lg shadow-sm">
                 <div className="space-y-2">
                   <h3 className="text-2xl font-bold">Enterprise</h3>
-                  <p className="text-4xl font-bold">$49/mo</p>
+                  <p className="text-4xl font-bold">$FREE/mo</p>
                   <p className="text-muted-foreground">Ideal for businesses</p>
                 </div>
                 <ul className="space-y-2 text-muted-foreground">
@@ -185,7 +186,7 @@ export function LandingPage() {
                     Custom Reporting
                   </li>
                 </ul>
-                <Button className="w-full">Get Started</Button>
+                <Button className="w-full" onClick={redirect('/signup')}>Get Started</Button>
               </Card>
             </div>
           </div>

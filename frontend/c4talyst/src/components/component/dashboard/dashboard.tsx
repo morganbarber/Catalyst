@@ -112,14 +112,6 @@ export default function Dashboard({children}: {children: React.ReactNode}) {
               Counseling
             </Link>
             <Link
-              href="/dashboard/debt"
-              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
-              prefetch={false}
-            >
-              <CreditCardIcon className="h-5 w-5" />
-              Debt
-            </Link>
-            <Link
               href="/dashboard/investing"
               className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
               prefetch={false}

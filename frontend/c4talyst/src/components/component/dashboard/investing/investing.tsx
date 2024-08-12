@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,6 +44,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+
+const baseUrl = "http://35.83.115.56:80";
 
 export default function Component() {
   const [investments, setInvestments] = useState([]);
@@ -140,8 +140,6 @@ export default function Component() {
       setError(error.message);
     }
   };
-
-  const baseUrl = "http://35.83.115.56:80"; // Replace with your actual backend URL
 
   // Function to fetch stock prices (implementation needed)
   const getPrice = async (symbol) => {
@@ -452,7 +450,7 @@ export default function Component() {
           <h2 className="text-xl font-bold">Stock Prices</h2>
           <Card>
             <CardContent>
-              <ChartAreaChart className="aspect-[9/4]" />
+              <ChartAreaChart className="aspect-[9/4]" portfolios={portfolios}/>
             </CardContent>
           </Card>
         </div>
@@ -737,67 +735,92 @@ export default function Component() {
   );
 }
 
-function ChartAreaChart(props) {
-  return (
-    <div {...props}>
-      <ChartContainer
-        config={{
-          desktop: {
-            label: "Desktop",
-            color: "hsl(var(--chart-1))",
-          },
-          mobile: {
-            label: "Mobile",
-            color: "hsl(var(--chart-2))",
-          },
-        }}
-        className="min-h-[300px]"
-      >
-        <AreaChart
-          accessibilityLayer
-          data={[
-            { month: "January", desktop: 186, mobile: 80 },
-            { month: "February", desktop: 305, mobile: 200 },
-            { month: "March", desktop: 237, mobile: 120 },
-            { month: "April", desktop: 73, mobile: 190 },
-            { month: "May", desktop: 209, mobile: 130 },
-            { month: "June", desktop: 214, mobile: 140 },
-          ]}
-          margin={{
-            left: 12,
-            right: 12,
-          }}
-        >
-          <CartesianGrid vertical={false} />
-          <XAxis
-            dataKey="month"
-            tickLine={false}
-            axisLine={false}
-            tickMargin={8}
-            tickFormatter={(value) => value.slice(0, 3)}
-          />
-          <ChartTooltip
-            cursor={false}
-            content={<ChartTooltipContent indicator="dot" />}
-          />
-          <Area
-            dataKey="mobile"
-            type="natural"
-            fill="var(--color-mobile)"
-            fillOpacity={0.4}
-            stroke="var(--color-mobile)"
-            stackId="a"
-          />
-          <Area
-            dataKey="desktop"
-            type="natural"
-            fill="var(--color-desktop)"
-            fillOpacity={0.4}
-            stroke="var(--color-desktop)"
-            stackId="a"
-          />
-        </AreaChart>
-      </ChartContainer>
-    </div>
-  );
+interface Portfolio {
+    id: string;
+    name: string;
+}
+
+interface ChartData {
+    month: string;
+    [key: string]: number | string;
+}
+
+function ChartAreaChart(props: { portfolios: Portfolio[] }) {
+    const [chartData, setChartData] = useState<ChartData[]>([]);
+    const [cookies] = useCookies();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+
+            const portfolioData = await fetch(`${baseUrl}/portfolio/historical`
+                , {
+                    headers: {
+                        Authorization: `Bearer ${cookies.accessToken}`,
+                    },
+                }
+            ).then((response) => response.json()
+            )
+
+            console.log(portfolioData)
+
+            // Format data for the chart
+            const formattedData: ChartData[] = [];
+            for (let i = 0; i < 6; i++) {
+                const monthData: ChartData = { month: i === 0 ? 'This Month' : `${i} Months Ago` };
+                props.portfolios.forEach((portfolio, index) => {
+                    const portfolioName = portfolio.name;
+                    const historicalValues = Object.values(portfolioData[index] || {}); // Assuming historical data is an object with stock names as keys
+                    monthData[portfolioName] = historicalValues[i] as string | number || 0; // Handle cases where historical data might be missing for a specific month
+                });
+                formattedData.push(monthData);
+            }
+
+            setChartData(formattedData);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchData();
+    }, [props.portfolios]);
+
+    const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+
+    return (
+        <div {...props}>
+            <ChartContainer className="min-h-[300px]" config={{}}>
+                <AreaChart
+                    accessibilityLayer
+                    data={chartData}
+                    margin={{
+                        left: 12,
+                        right: 12,
+                    }}
+                >
+                    <CartesianGrid vertical={false} />
+                    <XAxis
+                        dataKey="month"
+                        tickLine={false}
+                        axisLine={false}
+                        tickMargin={8}
+                    />
+                    <ChartTooltip
+                        cursor={false}
+                        content={<ChartTooltipContent indicator="dot" />}
+                    />
+                    {props.portfolios.map((portfolio) => (
+                        <Area
+                            key={portfolio.id}
+                            type="natural"
+                            dataKey={portfolio.name}
+                            stackId="1"
+                            stroke={randomColor}
+                            fillOpacity={0.4}
+                        />
+                    ))}
+                </AreaChart>
+            </ChartContainer>
+        </div>
+    );
 }

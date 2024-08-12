@@ -35,9 +35,8 @@ class InvestmentService:
             raise BadRequest(errors)
         
         # validate name is symbol
-        ticker = yf.Ticker(data['name'])
-        if not ticker.info:
-            raise BadRequest({'name': 'Invalid symbol'})
+        if not yf.Ticker(data['name']).info:
+            return jsonify({'error': 'Invalid symbol'}), 400
 
         investment = Investment(user_id=user_id, **data)
         db.session.add(investment)

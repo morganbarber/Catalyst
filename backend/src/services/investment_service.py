@@ -193,6 +193,8 @@ class PortfolioService:
                     recent_data = yf.download(investment.name, start=today - relativedelta(months=6), end=today)
                     print(recent_data['Close'].values.tolist())
                     historical_data[portfolio.name][investment.name] = recent_data['Close'].values.tolist()
+                    for i in historical_data[portfolio.name][investment.name]:
+                        historical_data[portfolio.name][investment.name] = i * investment.amount
 
         return historical_data
     

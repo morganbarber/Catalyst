@@ -322,7 +322,7 @@ export default function Component() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${cookies.accessToken}`,
           },
-          body: JSON.stringify(updatedPortfolio),
+          body: JSON.stringify(updatedPortfolio.filter((key) => key !== "id")),
         }
       );
 
@@ -810,7 +810,7 @@ function ChartAreaChart(props: { portfolios: Portfolio[] }) {
                             dataKey={portfolio.name}
                             stackId="1"
                             stroke={randomColor}
-                            fillOpacity={0.4}
+                            fillOpacity={0}
                         />
                     ))}
                 </AreaChart>

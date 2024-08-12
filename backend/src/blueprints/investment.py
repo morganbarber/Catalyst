@@ -161,8 +161,7 @@ def portfolio_adjustments():
 @jwt_required()
 def get_portfolio_historical_data():
     try:
-        portfolio_id = request.args.get('portfolio_id')
-        response = PortfolioService.get_portfolio_historical_data(portfolio_id)
+        response = PortfolioService.get_portfolio_historical_data()
         return jsonify(response), 200
     except NotFound as e:
         return jsonify({'error': str(e)}), 404

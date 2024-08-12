@@ -183,17 +183,10 @@ class PortfolioService:
         start_dates = [(today - timedelta(days=30 * i)).replace(day=1) for i in range(1, 7)]
 
         for investment in investments:
-            ticker_data = {}
-            ticker = yf.Ticker(investment.name)
-
-            for i, start_date in enumerate(start_dates):
-                end_date = (start_date + timedelta(days=30)).replace(day=1) - timedelta(days=1)
-                # Fetch data only if it's not the current month (to avoid incomplete data)
-                if end_date < today:
-                    data = ticker.history(start=start_date, end=end_date)
-                    ticker_data[start_date.strftime('%Y-%m')] = data['Close'].tolist()
-            
-            historical_data[investment.name] = ticker_data
+            if investment.portfolio_id == portfolio_id:
+                # get price 6 months ago, 5 months ago, 4 months ago, 3 months ago, 2 months ago, 1 month ago
+                historical_data[investment.name] = [yf.Ticker(investment.name).history(start=start_date, end=start_date + timedelta(days=30))['Close'].iloc[0] for start_date in start_dates]
+                print(historical_data)
 
         return jsonify(historical_data)
     
@@ -203,6 +196,5 @@ class PortfolioService:
             stock = yf.Ticker(symbol)
         except Exception as e:
             return jsonify({'error': 'Invalid symbol'}), 400
-        print(stock.info['currentPrice'])
         data = stock.info['currentPrice']
         return data

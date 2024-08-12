@@ -21,14 +21,11 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   CartesianGrid,
   XAxis,
   Area,
   AreaChart,
-  Line,
-  LineChart,
 } from "recharts";
 import {
   ChartTooltipContent,
@@ -36,7 +33,19 @@ import {
   ChartContainer,
 } from "@/components/ui/chart";
 import { useCookies } from "react-cookie";
-import { Select, SelectValue, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select"
+import {
+  Select,
+  SelectValue,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 export default function Component() {
   const [investments, setInvestments] = useState([]);
@@ -45,7 +54,11 @@ export default function Component() {
     useState(false);
   const [showCreatePortfolioDialog, setShowCreatePortfolioDialog] =
     useState(false);
+  const [showEditInvestmentDialog, setShowEditInvestmentDialog] = useState(false);
+  const [showEditPortfolioDialog, setShowEditPortfolioDialog] = useState(false);
   const [selectedPortfolioId, setSelectedPortfolioId] = useState(null);
+  const [editingInvestment, setEditingInvestment] = useState(null);
+  const [editingPortfolio, setEditingPortfolio] = useState(null);
 
   const handleCreateInvestment = () => {
     setShowCreateInvestmentDialog(true);
@@ -62,32 +75,94 @@ export default function Component() {
   const handleCloseCreatePortfolioDialog = () => {
     setShowCreatePortfolioDialog(false);
   };
+
+  const handleOpenEditInvestmentDialog = (investment) => {
+    setEditingInvestment(investment);
+    setShowEditInvestmentDialog(true);
+  };
+
+  const handleCloseEditInvestmentDialog = () => {
+    setEditingInvestment(null);
+    setShowEditInvestmentDialog(false);
+  };
+
+  const handleOpenEditPortfolioDialog = (portfolio) => {
+    setEditingPortfolio(portfolio);
+    setShowEditPortfolioDialog(true);
+  };
+
+  const handleCloseEditPortfolioDialog = () => {
+    setEditingPortfolio(null);
+    setShowEditPortfolioDialog(false);
+  };
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cookies, setCookie] = useCookies();
 
-  const baseUrl = "http://35.83.115.56:80";
-
-  const getPrice = async (symbol) => {
-      try {
-        const response = await fetch(`${baseUrl}/stocks/${symbol}`, {
-          headers: {
-            Authorization: `Bearer ${cookies.accessToken}`,
-          },
+  const handleDeleteInvestment = async (investmentId) => {
+    try {
+      const response = await fetch(`${baseUrl}/investments/${investmentId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${cookies.accessToken}`,
+        },
       });
-    
+
+      if (!response.ok) {
+        throw new Error("Failed to delete investment");
+      }
+
+      setInvestments(
+        investments.filter((investment) => investment.id !== investmentId)
+      );
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  const handleDeletePortfolio = async (portfolioId) => {
+    try {
+      const response = await fetch(`${baseUrl}/portfolios/${portfolioId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${cookies.accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete portfolio");
+      }
+
+      // Update portfolios state after deleting
+      setPortfolios(portfolios.filter((p) => p.id !== portfolioId));
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  const baseUrl = "http://35.83.115.56:80"; // Replace with your actual backend URL
+
+  // Function to fetch stock prices (implementation needed)
+  const getPrice = async (symbol) => {
+    try {
+      const response = await fetch(`${baseUrl}/stocks/${symbol}`, {
+        headers: {
+          Authorization: `Bearer ${cookies.accessToken}`,
+        },
+      });
+
       if (!response.ok) {
         throw new Error("Failed to fetch stock price");
       }
-    
-        const data = await response.text();
-        console.log(data);
-        return data;
-      } catch (error: any) {
-        setError(error.message);
-      }
-    };
 
+      const data = await response.text(); // Assuming API returns price as text
+      return parseFloat(data); // Parse the price to a number
+    } catch (error) {
+      setError(error.message);
+      return null; // Return null in case of error
+    }
+  };
 
   useEffect(() => {
     const fetchInvestments = async () => {
@@ -122,7 +197,27 @@ export default function Component() {
           throw new Error("Failed to fetch portfolios");
         }
         const data = await response.json();
-        setPortfolios(data);
+
+        // Fetch stock prices for each investment and update the data
+        const updatedPortfolios = await Promise.all(
+          data.map(async (portfolio) => {
+            const updatedInvestments = await Promise.all(
+              portfolio.investments.map(async (investment) => {
+                const price = await getPrice(investment.name); // Assuming 'name' field holds the stock symbol
+                return {
+                  ...investment,
+                  currentPrice: price, // Add current price to investment object
+                };
+              })
+            );
+            return {
+              ...portfolio,
+              investments: updatedInvestments,
+            };
+          })
+        );
+
+        setPortfolios(updatedPortfolios);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -135,13 +230,12 @@ export default function Component() {
   }, []);
 
   const totalValue = portfolios.reduce((total, portfolio) => {
-    const portfolioValue = portfolio.investments.reduce(
-      (sum, investment) => {
-        return sum + parseFloat(investment.amount);
-      },
-      0
+    return (
+      total +
+      portfolio.investments.reduce((sum, investment) => {
+        return sum + parseFloat(investment.amount) * investment.currentPrice;
+      }, 0)
     );
-    return total + portfolioValue;
   }, 0);
 
   const handleSaveInvestment = async (newInvestment) => {
@@ -190,6 +284,66 @@ export default function Component() {
     }
   };
 
+  const handleUpdateInvestment = async (updatedInvestment) => {
+    try {
+      const response = await fetch(
+        `${baseUrl}/investments/${updatedInvestment.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookies.accessToken}`,
+          },
+          body: JSON.stringify(updatedInvestment),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update investment");
+      }
+
+      const data = await response.json();
+      setInvestments(
+        investments.map((investment) =>
+          investment.id === data.id ? data : investment
+        )
+      );
+      setShowEditInvestmentDialog(false);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  const handleUpdatePortfolio = async (updatedPortfolio) => {
+    try {
+      const response = await fetch(
+        `${baseUrl}/portfolios/${updatedPortfolio.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookies.accessToken}`,
+          },
+          body: JSON.stringify(updatedPortfolio),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update portfolio");
+      }
+
+      const data = await response.json();
+      setPortfolios(
+        portfolios.map((portfolio) =>
+          portfolio.id === data.id ? data : portfolio
+        )
+      );
+      setShowEditPortfolioDialog(false);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
   if (loading) {
     return <div>Loading investments...</div>;
   }
@@ -214,12 +368,10 @@ export default function Component() {
               <div className="text-lg font-semibold">
                 Total Value: ${totalValue.toFixed(2)}
               </div>
-              <Button onClick={handleCreateInvestment}>{" "}
-                {/* Fixed */}
+              <Button onClick={handleCreateInvestment}>
                 Create Investment
               </Button>
-              <Button onClick={handleCreatePortfolio}>{" "}
-                {/* Fixed */}
+              <Button onClick={handleCreatePortfolio}>
                 Create Portfolio
               </Button>
             </div>
@@ -230,15 +382,20 @@ export default function Component() {
                 <TableRow>
                   <TableHead>Portfolio</TableHead>
                   <TableHead>Investment</TableHead>
-                  <TableHead>Amount</TableHead>
+                  <TableHead>Shares</TableHead>
                   <TableHead className="text-right">Value</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {portfolios.map((portfolio) => (
                   <React.Fragment key={portfolio.id}>
                     <TableRow>
-                      <TableCell colSpan={4} className="font-bold">
+                      <TableCell
+                        colSpan={5}
+                        className="font-bold hover:bg-gray-100"
+                        onClick={() => handleOpenEditPortfolioDialog(portfolio)}
+                      >
                         {portfolio.name}
                       </TableCell>
                     </TableRow>
@@ -248,7 +405,40 @@ export default function Component() {
                         <TableCell>{investment.name}</TableCell>
                         <TableCell>{investment.amount.toFixed(2)}</TableCell>
                         <TableCell className="text-right">
-                          ${investment.amount * parseFloat(investment.name)}
+                          $
+                          {(
+                            investment.amount * investment.currentPrice
+                          ).toFixed(2)}
+                        </TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="rounded-full border w-8 h-8"
+                              >
+                                <div className="h-4 w-4" />
+                                <span className="sr-only">Toggle menu</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleOpenEditInvestmentDialog(investment)
+                                }
+                              >
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleDeleteInvestment(investment.id)
+                                }
+                              >
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -268,7 +458,10 @@ export default function Component() {
         </div>
       </div>
       {showCreateInvestmentDialog && (
-        <Dialog open={showCreateInvestmentDialog} onOpenChange={handleCreateInvestment}>
+        <Dialog
+          open={showCreateInvestmentDialog}
+          onOpenChange={handleCloseCreateInvestmentDialog}
+        >
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Create Investment</DialogTitle>
@@ -278,7 +471,7 @@ export default function Component() {
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid items-center grid-cols-4 gap-4">
-                <Label htmlFor="name" className="text-right">
+                <Label htmlFor="investmentName" className="text-right">
                   Symbol
                 </Label>
                 <Input
@@ -288,7 +481,7 @@ export default function Component() {
                 />
               </div>
               <div className="grid items-center grid-cols-4 gap-4">
-                <Label htmlFor="amount" className="text-right">
+                <Label htmlFor="investmentAmount" className="text-right">
                   Shares
                 </Label>
                 <Input
@@ -299,20 +492,25 @@ export default function Component() {
                 />
               </div>
               <div className="grid items-center grid-cols-4 gap-4">
-                <Label htmlFor="portfolioId" className="text-right">
+                <Label htmlFor="investmentPortfolioId" className="text-right">
                   Portfolio
                 </Label>
                 <Select
                   id="investmentPortfolioId"
                   className="col-span-3"
-                  onValueChange={(value) => setSelectedPortfolioId(parseInt(value))} 
+                  onValueChange={(value) =>
+                    setSelectedPortfolioId(parseInt(value))
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select a portfolio" />
                   </SelectTrigger>
                   <SelectContent>
                     {portfolios.map((portfolio) => (
-                      <SelectItem key={portfolio.id} value={portfolio.id.toString()}>
+                      <SelectItem
+                        key={portfolio.id}
+                        value={portfolio.id.toString()}
+                      >
                         {portfolio.name}
                       </SelectItem>
                     ))}
@@ -329,7 +527,7 @@ export default function Component() {
                     amount: parseFloat(
                       document.getElementById("investmentAmount").value
                     ),
-                    portfolio_id: selectedPortfolioId, // Use the selected portfolio ID
+                    portfolio_id: selectedPortfolioId,
                   })
                 }
               >
@@ -350,7 +548,7 @@ export default function Component() {
       {showCreatePortfolioDialog && (
         <Dialog
           open={showCreatePortfolioDialog}
-          onOpenChange={handleCreatePortfolio}
+          onOpenChange={handleCloseCreatePortfolioDialog}
         >
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
@@ -361,7 +559,7 @@ export default function Component() {
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid items-center grid-cols-4 gap-4">
-                <Label htmlFor="name" className="text-right">
+                <Label htmlFor="portfolioName" className="text-right">
                   Name
                 </Label>
                 <Input
@@ -386,6 +584,147 @@ export default function Component() {
                 <Button
                   variant="outline"
                   onClick={handleCloseCreatePortfolioDialog}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+      {showEditInvestmentDialog && editingInvestment && (
+        <Dialog
+          open={showEditInvestmentDialog}
+          onOpenChange={handleCloseEditInvestmentDialog}
+        >
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit Investment</DialogTitle>
+              <DialogDescription>
+                Modify the details of this investment.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid items-center grid-cols-4 gap-4">
+                <Label htmlFor="editInvestmentName" className="text-right">
+                  Symbol
+                </Label>
+                <Input
+                  id="editInvestmentName"
+                  defaultValue={editingInvestment.name}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid items-center grid-cols-4 gap-4">
+                <Label htmlFor="editInvestmentAmount" className="text-right">
+                  Shares
+                </Label>
+                <Input
+                  id="editInvestmentAmount"
+                  defaultValue={editingInvestment.amount}
+                  className="col-span-3"
+                  type="number"
+                />
+              </div>
+              <div className="grid items-center grid-cols-4 gap-4">
+                <Label
+                  htmlFor="editInvestmentPortfolioId"
+                  className="text-right"
+                >
+                  Portfolio
+                </Label>
+                <Select
+                  id="editInvestmentPortfolioId"
+                  className="col-span-3"
+                  defaultValue={editingInvestment.portfolio_id.toString()}
+                  onValueChange={(value) =>
+                    setSelectedPortfolioId(parseInt(value))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a portfolio" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {portfolios.map((portfolio) => (
+                      <SelectItem
+                        key={portfolio.id}
+                        value={portfolio.id.toString()}
+                      >
+                        {portfolio.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                type="submit"
+                onClick={() =>
+                  handleUpdateInvestment({
+                    id: editingInvestment.id,
+                    name: document.getElementById("editInvestmentName").value,
+                    amount: parseFloat(
+                      document.getElementById("editInvestmentAmount").value
+                    ),
+                    portfolio_id: selectedPortfolioId,
+                  })
+                }
+              >
+                Save Changes
+              </Button>
+              <div>
+                <Button
+                  variant="outline"
+                  onClick={handleCloseEditInvestmentDialog}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+      {showEditPortfolioDialog && editingPortfolio && (
+        <Dialog
+          open={showEditPortfolioDialog}
+          onOpenChange={handleCloseEditPortfolioDialog}
+        >
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit Portfolio</DialogTitle>
+              <DialogDescription>
+                Modify the name of this portfolio.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid items-center grid-cols-4 gap-4">
+                <Label htmlFor="editPortfolioName" className="text-right">
+                  Name
+                </Label>
+                <Input
+                  id="editPortfolioName"
+                  defaultValue={editingPortfolio.name}
+                  className="col-span-3"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                type="submit"
+                onClick={() =>
+                  handleUpdatePortfolio({
+                    id: editingPortfolio.id,
+                    name: document.getElementById("editPortfolioName").value,
+                  })
+                }
+              >
+                Save Changes
+              </Button>
+              <div>
+                <Button
+                  variant="outline"
+                  onClick={handleCloseEditPortfolioDialog}
                 >
                   Cancel
                 </Button>

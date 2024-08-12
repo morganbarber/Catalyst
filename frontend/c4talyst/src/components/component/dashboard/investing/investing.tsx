@@ -69,20 +69,21 @@ export default function Component() {
   const baseUrl = "http://35.83.115.56:80";
 
   const getPrice = async (symbol) => {
-    try {
-      const response = await fetch(`${baseUrl}/stocks/${symbol}`, {
-        headers: {
-          Authorization: `Bearer ${cookies.accessToken}`,
-        },
-    });
+      try {
+        const response = await fetch(`${baseUrl}/stocks/${symbol}`, {
+          headers: {
+            Authorization: `Bearer ${cookies.accessToken}`,
+          },
+      });
     
-        if (!response.ok) {
-          throw new Error("Failed to fetch stock price");
-        }
+      if (!response.ok) {
+        throw new Error("Failed to fetch stock price");
+      }
     
-        const data = await response.json();
-        return data.price;
-     } catch (error) {
+        const data = await response.text();
+        console.log(data);
+        return data;
+      } catch (error: any) {
         setError(error.message);
       }
     };
@@ -247,7 +248,7 @@ export default function Component() {
                         <TableCell>{investment.name}</TableCell>
                         <TableCell>{investment.amount.toFixed(2)}</TableCell>
                         <TableCell className="text-right">
-                          ${investment.amount * getPrice(investment.name)}
+                          ${investment.amount * parseFloat(investment.name)}
                         </TableCell>
                       </TableRow>
                     ))}

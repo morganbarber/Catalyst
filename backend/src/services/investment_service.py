@@ -170,7 +170,7 @@ class PortfolioService:
         return jsonify(response)
     
     @staticmethod
-    def get_portfolio_historical_data(portfolio_id):
+    def get_portfolio_historical_data():
         user_id = get_jwt_identity()
         portfolios = Portfolio.query.filter_by(user_id=user_id).all()
         if not portfolios:

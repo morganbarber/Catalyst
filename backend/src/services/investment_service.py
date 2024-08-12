@@ -126,6 +126,7 @@ class PortfolioService:
 
         errors = portfolio_schema.validate(data)
         if errors:
+            print(errors)
             raise BadRequest(errors)
 
         for key, value in data.items():

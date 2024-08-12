@@ -44,6 +44,7 @@ class BaseService:
 
         for key, value in data.items():
             if value is not None:
+                print(key, value)
                 setattr(record, key, value)
 
         db.session.commit()

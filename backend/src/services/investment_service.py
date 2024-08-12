@@ -173,6 +173,7 @@ class PortfolioService:
     def get_portfolio_historical_data():
         user_id = get_jwt_identity()
         portfolios = Portfolio.query.filter_by(user_id=user_id).all()
+        investments = Investment.query.filter_by(user_id=user_id).all()
         if not portfolios:
             raise NotFound('Portfolio not found')
 
@@ -183,14 +184,14 @@ class PortfolioService:
 
         historical_data = {}
 
-        for investment in investments:
-            if investment.portfolio_id == portfolio_id:
-                # get price 6 months ago, 5 months ago, 4 months ago, 3 months ago, 2 months ago, 1 month ago
-                historical_prices = []
-                for start_date in start_dates:
-                    price = InvestmentService.get_stock_price(investment.name)
-                    historical_prices.append(price)
-                historical_data[investment.name] = historical_prices
+        for portfolio in portfolios:
+            for investment in investments:
+                    # get price 6 months ago, 5 months ago, 4 months ago, 3 months ago, 2 months ago, 1 month ago
+                    historical_prices = []
+                    for start_date in start_dates:
+                        price = InvestmentService.get_stock_price(investment.name)
+                        historical_prices.append(price)
+                    historical_data[investment.name] = historical_prices
 
         return jsonify(historical_data)
     

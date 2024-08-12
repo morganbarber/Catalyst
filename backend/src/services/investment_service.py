@@ -186,6 +186,7 @@ class PortfolioService:
 
         for portfolio in portfolios:
             for investment in investments:
+                if investment.portfolio_id == portfolio.id:
                     # get price 6 months ago, 5 months ago, 4 months ago, 3 months ago, 2 months ago, 1 month ago
                     historical_prices = []
                     for start_date in start_dates:

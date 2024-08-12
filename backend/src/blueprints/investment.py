@@ -37,6 +37,7 @@ def get_investments():
     except NotFound as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
+        print(e)
         return jsonify({'error': 'Internal server error'}), 500
 
 @investment_bp.route('/investments/<int:investment_id>', methods=['GET'])

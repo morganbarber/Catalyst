@@ -42,4 +42,6 @@ class client:
         }
         response = requests.post(url, headers=headers, json=payload, params={"key": self.api_key})
 
-        return response.json()["canidates"][0]["parts"][0]["text"]
+        print(response.json())
+
+        return response.json()['candidates'][0]['content']['parts'][0]['text']

@@ -44,6 +44,7 @@ class BaseService:
 
         errors = schema.validate(data)
         if errors:
+            print(errors)
             raise BadRequest(errors)
 
         for key, value in data.items():

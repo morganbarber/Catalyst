@@ -6,17 +6,13 @@ class Services:
         self.client = client
 
     def score_finances(self, sub=False):
-        income_service = IncomeTrackingService()
-        expense_service = ExpenseTrackingService()
+        incomes = IncomeTrackingService.get_incomes()
+        expenses = ExpenseTrackingService.get_expenses()
+        incomes_info = "\n".join([f"Income: {income['name']} - Amount: ${income['amount']} - Frequency: {income['frequency']}" for income in incomes])
+        expenses_info = "\n".join([f"Expense: {expense['name']} - Amount: ${expense['amount']} - Frequency: {expense['frequency']}" for expense in expenses])
 
-        incomes = income_service.get_incomes()
-        expenses = expense_service.get_expenses()
-
-        incomes_info = "\n".join([f"Income: {income.name} - Amount: ${income.amount}" for income in incomes])
-        expenses_info = "\n".join([f"Expense: {expense.name} - Amount: ${expense.amount}" for expense in expenses])
-
-        total_income = sum([income.amount for income in incomes])
-        total_expense = sum([expense.amount for expense in expenses])
+        total_income = sum([income['amount'] for income in incomes])
+        total_expense = sum([expense['amount'] for expense in expenses])
         net_income = total_income - total_expense
 
         context = f"Incomes:\n{incomes_info}\nExpenses:\n{expenses_info}\nTotal Income: ${total_income}\nTotal Expense: ${total_expense}\nNet Income: ${net_income}"
@@ -31,9 +27,9 @@ class Services:
     def chat(self, data):
         messages = data["messages"]
 
-        context += self.score_finances(sub=True)
+        context = self.score_finances(sub=True)
 
-        context += "\n".join([f"{message['sender']}: {message['content']}" + "\n" for message in messages])
+        context += "\n\n".join([f"{message['sender']}: {message['content']}" + "\n" for message in messages])
 
         response = self.client.inference(context=context, prompt="chat")
 

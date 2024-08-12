@@ -86,7 +86,7 @@ class InvestmentService:
         db.session.delete(investment)
         db.session.commit()
 
-        return jsonify({'message': 'Investment deleted successfully'})
+        return {'message': 'Investment deleted successfully'}
 
 class PortfolioService:
 

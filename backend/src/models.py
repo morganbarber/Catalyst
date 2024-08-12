@@ -116,8 +116,6 @@ class Budget(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     name = db.Column(db.String(100), nullable=False)
     total_amount = db.Column(db.Float, nullable=False)
-    start_date = db.Column(db.Date, nullable=False)
-    end_date = db.Column(db.Date, nullable=False)
     description = db.Column(db.Text)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     emergency_fund = db.Column(db.Float)

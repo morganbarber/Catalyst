@@ -41,8 +41,6 @@ class BudgetService:
                 user_id=user_id,
                 name=budget_data['name'],
                 total_amount=remaining_budget,
-                start_date=budget_data['start_date'],
-                end_date=budget_data['end_date'],
                 description=budget_data.get('description'),
                 emergency_fund=emergency_fund,
                 discretionary_spending=discretionary_spending,

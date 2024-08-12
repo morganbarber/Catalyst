@@ -115,8 +115,8 @@ class Budget(db.Model):
     __tablename__ = 'budget'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     name = db.Column(db.String(100), nullable=False)
-    total_amount = db.Column(db.Float, nullable=False)
     description = db.Column(db.Text)
+    total_amount = db.Column(db.Float)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     emergency_fund = db.Column(db.Float)
     discretionary_spending = db.Column(db.Float)
@@ -136,8 +136,6 @@ class Goal(db.Model):
     description = db.Column(db.Text)
     target_amount = db.Column(db.Float, nullable=False)
     current_amount = db.Column(db.Float, default=0.0)
-    start_date = db.Column(db.Date, nullable=False)
-    end_date = db.Column(db.Date, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __repr__(self):

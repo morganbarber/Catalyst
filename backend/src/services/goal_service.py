@@ -23,6 +23,7 @@ class GoalService:
             user_id=user_id,
             name=goal_data['name'],
             description=goal_data.get('description'),
+            current_amount=goal_data['current_amount'],
             target_amount=goal_data['target_amount'],
             start_date=goal_data['start_date'],
             end_date=goal_data['end_date']

@@ -67,9 +67,10 @@ class InvestmentSchema(Schema):
     risk_profile = fields.String(required=True)
     description = fields.String()
     user_id = fields.Integer(dump_only=True)
+    portfolio_id = fields.Integer(required=True)
 
     class Meta:
-        fields = ("id", "name", "amount", "risk_profile", "description", "user_id")
+        fields = ("id", "name", "amount", "risk_profile", "description", "user_id", "portfolio_id")
 
 class PortfolioSchema(Schema):
     id = fields.Integer(dump_only=True)

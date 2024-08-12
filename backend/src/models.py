@@ -94,7 +94,7 @@ class Investment(db.Model):
     risk_profile = db.Column(db.String(50), nullable=False)
     description = db.Column(db.Text)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    portfolio = db.Column(db.Integer, db.ForeignKey('portfolio.id'), nullable=True, default=None)
+    portfolio_id = db.Column(db.Integer, db.ForeignKey('portfolio.id'), nullable=False)
 
     def __repr__(self):
         return f'<Investment {self.name} - {self.amount}>'
@@ -106,7 +106,7 @@ class Portfolio(db.Model):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    investments = db.relationship('Investment', backref='portfolio_name', lazy=True)
+    investments = db.relationship('Investment', backref='portfolio', lazy=True)
 
     def __repr__(self):
         return f'<Portfolio {self.name}>'

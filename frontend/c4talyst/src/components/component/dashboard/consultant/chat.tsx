@@ -4,55 +4,73 @@ import { useState, useRef, useEffect } from "react";
 import { useCookies } from "react-cookie";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { set } from "date-fns";
 
 export function Chat() {
   const [cookies, setCookie, removeCookie] = useCookies(['accessToken', 'refreshToken']);
-
   const [messages, setMessages] = useState([
     {
       id: 1,
       sender: "Financial Advisor",
       content:
         "Hello, what can I help you with? For your convenience, I will be granted access to any of your resources when relevant.",
-      timestamp: "2:30 PM",
+      timestamp: new Date().toLocaleTimeString(),
     },
   ]);
-
   const chatContainerRef = useRef(null);
 
-  const handleSendMessage = (message) => {
+  const handleAddMessage = (message: any) => {
     if (message === "") return;
 
+    setMessages(prevMessages => [
+      ...prevMessages,
+      {
+        id: prevMessages.length + 1,
+        sender: "You",
+        content: message,
+        timestamp: new Date().toLocaleTimeString(),
+      },
+    ]);
+  };
+
+  const handleSendMessage = async () => {
     try {
-      const response = fetch("http://35.83.115.56/llm/chat", {
+      const response = await fetch("http://35.83.115.56/llm/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${cookies.accessToken}`,
         },
-        body: JSON.stringify({ messages }),
+        body: JSON.stringify({ messages }), // Sending the whole messages array
       });
 
-      setMessages([
-        ...messages,
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data1 = await response.text();
+      const data = JSON.parse(data1);
+      
+      setMessages(prevMessages => [
+        ...prevMessages,
         {
-          id: messages.length + 1,
-          sender: "You",
-          content: message,
-          timestamp: new Date().toLocaleTimeString(),
-        },
-        {
-          id: messages.length + 1,
+          id: prevMessages.length + 1,
           sender: "Financial Advisor",
-          content: "test",
+          content: JSON.parse(data)['response'],
           timestamp: new Date().toLocaleTimeString(),
         },
       ]);
     } catch (error) {
-      console.error(error);
+      console.error("There was an error sending the message:", error);
     }
   };
+
+  // Call handleSendMessage when a new user message is added
+  useEffect(() => {
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage && lastMessage.sender === "You") {
+      handleSendMessage();
+    }
+  }, [messages]); 
 
   // Scroll to the bottom whenever messages change
   useEffect(() => {
@@ -63,7 +81,11 @@ export function Chat() {
 
   return (
     <div className="flex h-screen flex-col">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 chat-container" ref={chatContainerRef} style={{ paddingBottom: '4rem' }}>
+      <div
+        className="flex-1 overflow-y-auto p-4 space-y-4 chat-container"
+        ref={chatContainerRef}
+        style={{ paddingBottom: '4rem' }}
+      >
         {messages.map((message) => (
           <div
             key={message.id}
@@ -77,7 +99,9 @@ export function Chat() {
               <div className="font-medium">{message.sender}</div>
               <div>{message.content}</div>
             </div>
-            <div className="text-xs text-muted-foreground">{message.timestamp}</div>
+            <div className="text-xs text-muted-foreground">
+              {message.timestamp}
+            </div>
           </div>
         ))}
       </div>
@@ -85,7 +109,7 @@ export function Chat() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            handleSendMessage(e.target.message.value);
+            handleAddMessage(e.target.message.value);
             e.target.message.value = "";
           }}
           className="flex items-center gap-2"

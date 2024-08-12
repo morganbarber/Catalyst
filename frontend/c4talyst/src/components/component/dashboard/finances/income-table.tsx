@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { useCookies } from 'react-cookie';
-import { ValueProvider, useValue } from "./financeContext"
 
 export function IncomeTable() {
   const [Incomes, setIncomes] = useState<{ id: number; name: string; frequency: string; amount: number; color: string; description: string; }[]>([]);
@@ -148,11 +147,11 @@ export function IncomeTable() {
         income.id === id
           ? {
               ...income,
-              name: updatedIncome.name,
-              frequency: updatedIncome.frequency,
-              amount: updatedIncome.amount,
-              color: updatedIncome.color,
-              description: updatedIncome.description,
+              name: updatedIncome.name ?? income.name,
+              frequency: updatedIncome.frequency ?? income.frequency,
+              amount: updatedIncome.amount ?? income.amount,
+              color: updatedIncome.color ?? income.color,
+              description: updatedIncome.description ?? income.description,
             }
           : income,
       ),
@@ -206,6 +205,7 @@ export function IncomeTable() {
   }
 
   const handleOpenEditIncomeDialog = (income, event) => {
+    event.stopPropagation();
     setIncomeToEdit(income)
     setIsEditIncomeDialogOpen(true)
     setIsIncomeDetailsDialogOpen(false)

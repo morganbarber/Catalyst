@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
@@ -6,82 +8,42 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { CartesianGrid, XAxis, YAxis, Area, AreaChart, Line, LineChart } from "recharts"
+import { CartesianGrid, XAxis, Area, AreaChart, Line, LineChart } from "recharts"
 import { ChartTooltipContent, ChartTooltip, ChartContainer } from "@/components/ui/chart"
-import { useCookies } from "react-cookie"
 
-export default function Investing() {
+export default function Component() {
   const [investments, setInvestments] = useState([])
-  const [portfolios, setPortfolios] = useState([])
-  const [historicalData, setHistoricalData] = useState([])
+  const [stockPrices, setStockPrices] = useState([])
   const [showCreateInvestmentDialog, setShowCreateInvestmentDialog] = useState(false)
   const [showCreatePortfolioDialog, setShowCreatePortfolioDialog] = useState(false)
-  const [cookies] = useCookies(["accessToken"])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
+  const baseUrl = "http://35.83.115.56" 
+  
   useEffect(() => {
     const fetchInvestments = async () => {
       try {
-        const response = await fetch("http://35.83.115.56/investments", {
-          headers: {
-            "Authorization": `Bearer ${cookies.accessToken}`,
-          },  
-        })
-        if (response.ok) {
-          const data = await response.json()
-          setInvestments(data)
-        } else {
-          console.error("Failed to fetch investments")
+        const response = await fetch(`${baseUrl}/investments`)
+        if (!response.ok) {
+          throw new Error("Failed to fetch investments")
         }
+        const data = await response.json()
+        setInvestments(data)
       } catch (error) {
-        console.error("Error fetching investments:", error)
-      }
-    }
-
-    const fetchPortfolios = async () => {
-      try {
-        const response = await fetch("http://35.83.115.56/portfolios", {
-          headers: {
-            "Authorization": `Bearer ${cookies.accessToken}`,
-          },
-        })
-        if (response.ok) {
-          const data = await response.json()
-          setPortfolios(data)
-        } else {
-          console.error("Failed to fetch portfolios")
-        }
-      } catch (error) {
-        console.error("Error fetching portfolios:", error)
-      }
-    }
-
-    const fetchHistoricalData = async () => {
-      // Replace this with actual API call to fetch historical data
-      try {
-        // Assuming the API returns data in the format:
-        // [ { date: "2023-07-01", "Portfolio A": 12000, "Portfolio B": 15000, ... }, ... ]
-        const response = await fetch("/api/historical_data", {
-          credentials: "include",
-        })
-        if (response.ok) {
-          const data = await response.json()
-          setHistoricalData(data)
-        } else {
-          console.error("Failed to fetch historical data")
-        }
-      } catch (error) {
-        console.error("Error fetching historical data:", error)
+        setError(error.message)
+      } finally {
+        setLoading(false)
       }
     }
 
     fetchInvestments()
-    fetchPortfolios()
-    fetchHistoricalData()
   }, [])
 
-  const totalValue = portfolios.reduce((total, portfolio) => {
-    const portfolioInvestments = investments.filter((investment) => investment.portfolio_id === portfolio.id)
-    const portfolioValue = portfolioInvestments.reduce((sum, investment) => sum + parseFloat(investment.amount), 0)
+  const totalValue = investments.reduce((total, portfolio) => {
+    const portfolioValue = portfolio.stocks.reduce((sum, stock) => {
+      return sum + stock.price * stock.shares
+    }, 0)
     return total + portfolioValue
   }, 0)
 
@@ -100,69 +62,82 @@ export default function Investing() {
   const handleCloseCreatePortfolioDialog = () => {
     setShowCreatePortfolioDialog(false)
   }
-
+  
   const handleSaveInvestment = async (newInvestment) => {
     try {
-      const response = await fetch("http://35.83.115.56/investments", {
-        method: "POST",
+      const response = await fetch(`${baseUrl}/investments`, {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          "Auhorization": `Bearer ${cookies.accessToken}`,
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(newInvestment),
-        credentials: "include",
+        body: JSON.stringify(newInvestment) 
       })
-
-      if (response.ok) {
-        const data = await response.json()
-        setInvestments([...investments, data])
-        setShowCreateInvestmentDialog(false)
-      } else {
-        console.error("Failed to create investment")
+  
+      if (!response.ok) {
+        throw new Error('Failed to create investment') 
       }
+  
+      // Update investments state after successful creation
+      const data = await response.json()
+      setInvestments([...investments, data]) 
+      setShowCreateInvestmentDialog(false)
     } catch (error) {
-      console.error("Error creating investment:", error)
+      setError(error.message)
     }
-  }
+  }  
 
   const handleSavePortfolio = async (newPortfolio) => {
     try {
-      const response = await fetch("http://35.83.115.56/portfolios", {
-        method: "POST",
+      const response = await fetch(`${baseUrl}/portfolios`, {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          "Auhorization": `Bearer ${cookies.accessToken}`,
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(newPortfolio),
-        credentials: "include",
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setPortfolios([...portfolios, data])
-        setShowCreatePortfolioDialog(false)
-      } else {
-        console.error("Failed to create portfolio")
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to create portfolio'); 
       }
+  
+      const data = await response.json();
+      setInvestments([...investments, data]);
+      setShowCreatePortfolioDialog(false);
     } catch (error) {
-      console.error("Error creating portfolio:", error)
+      setError(error.message); 
     }
+  };
+
+  if (loading) {
+    return <div>Loading investments...</div>
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>
   }
 
   return (
     <div className="grid gap-8 p-6 md:p-8">
       <div className="grid gap-4">
         <h1 className="text-2xl font-bold">Investment Manager</h1>
-        <p className="text-muted-foreground">View and manage your investment portfolios and stocks.</p>
+        <p className="text-muted-foreground">
+          View and manage your investment portfolios and stocks.
+        </p>
       </div>
       <div className="grid gap-8">
         <div className="grid gap-6">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">Investments</h2>
             <div className="flex items-center gap-4">
-              <div className="text-lg font-semibold">Total Value: ${totalValue.toFixed(2)}</div>
-              <Button onClick={handleCreateInvestment}>Create Investment</Button>
-              <Button onClick={handleCreatePortfolio}>Create Portfolio</Button>
+              <div className="text-lg font-semibold">
+                Total Value: ${totalValue.toFixed(2)}
+              </div>
+              <Button onClick={handleCreateInvestment}>
+                Create Investment
+              </Button>
+              <Button onClick={handleCreatePortfolio}>
+                Create Portfolio
+              </Button>
             </div>
           </div>
           <div className="border rounded-lg overflow-auto">
@@ -170,24 +145,31 @@ export default function Investing() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Portfolio</TableHead>
-                  <TableHead>Investment</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Risk Profile</TableHead>
+                  <TableHead>Stock</TableHead>
+                  <TableHead>Price</TableHead>
+                  <TableHead>Shares</TableHead>
+                  <TableHead className="text-right">Value</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {portfolios.map((portfolio) => (
+                {investments.map((portfolio) => (
                   <React.Fragment key={portfolio.id}>
-                    {investments
-                      .filter((investment) => investment.portfolio_id === portfolio.id)
-                      .map((investment) => (
-                        <TableRow key={investment.id}>
-                          <TableCell>{portfolio.name}</TableCell>
-                          <TableCell>{investment.name}</TableCell>
-                          <TableCell>${parseFloat(investment.amount).toFixed(2)}</TableCell>
-                          <TableCell>{investment.risk_profile}</TableCell>
-                        </TableRow>
-                      ))}
+                    <TableRow>
+                      <TableCell colSpan={5} className="font-bold">
+                        {portfolio.name}
+                      </TableCell>
+                    </TableRow>
+                    {portfolio.stocks.map((stock) => (
+                      <TableRow key={`${portfolio.id}-${stock.id}`}>
+                        <TableCell />
+                        <TableCell>{stock.name}</TableCell>
+                        <TableCell>${stock.price.toFixed(2)}</TableCell>
+                        <TableCell>{stock.shares}</TableCell>
+                        <TableCell className="text-right">
+                          ${(stock.price * stock.shares).toFixed(2)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
                   </React.Fragment>
                 ))}
               </TableBody>
@@ -195,63 +177,69 @@ export default function Investing() {
           </div>
         </div>
         <div className="grid gap-6">
-          <h2 className="text-xl font-bold">Portfolio Performance</h2>
+          <h2 className="text-xl font-bold">Stock Prices</h2>
           <Card>
             <CardContent>
-              <HistoricalChart data={historicalData} />
+              <AreachartstackedChart className="aspect-[9/4]" />
             </CardContent>
           </Card>
         </div>
       </div>
       {showCreateInvestmentDialog && (
-        <Dialog open={showCreateInvestmentDialog} onOpenChange={handleCloseCreateInvestmentDialog}>
+        <Dialog>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Create Investment</DialogTitle>
-              <DialogDescription>Enter the details for your new investment.</DialogDescription>
+              <DialogDescription>
+                Enter the details for your new investment.
+              </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid items-center grid-cols-4 gap-4">
                 <Label htmlFor="name" className="text-right">
                   Name
                 </Label>
-                <Input id="investmentName" placeholder="Investment Name" className="col-span-3" />
+                <Input
+                  id="investmentName"
+                  placeholder="Investment Name"
+                  className="col-span-3"
+                />
               </div>
               <div className="grid items-center grid-cols-4 gap-4">
-                <Label htmlFor="amount" className="text-right">
-                  Amount
+                <Label htmlFor="stocks" className="text-right">
+                  Stocks
                 </Label>
-                <Input id="investmentAmount" placeholder="Investment Amount" className="col-span-3" />
-              </div>
-              <div className="grid items-center grid-cols-4 gap-4">
-                <Label htmlFor="riskProfile" className="text-right">
-                  Risk Profile
-                </Label>
-                <Input id="investmentRiskProfile" placeholder="Risk Profile" className="col-span-3" />
-              </div>
-              <div className="grid items-center grid-cols-4 gap-4">
-                <Label htmlFor="portfolioId" className="text-right">
-                  Portfolio ID
-                </Label>
-                <Input id="investmentPortfolioId" placeholder="Portfolio ID" className="col-span-3" />
+                <Textarea
+                  id="investmentStocks"
+                  placeholder="Stock1, Stock2, Stock3"
+                  className="col-span-3"
+                />
               </div>
             </div>
             <DialogFooter>
               <Button
                 type="submit"
-                onClick={(e) =>
+                onClick={() =>
                   handleSaveInvestment({
-                    name: document.getElementById("investmentName").value,
-                    amount: parseFloat(document.getElementById("investmentAmount").value),
-                    risk_profile: document.getElementById("investmentRiskProfile").value,
-                    portfolio_id: parseInt(document.getElementById("investmentPortfolioId").value),
+                    name: document.getElementById('investmentName').value,
+                    stocks: document
+                      .getElementById('investmentStocks')
+                      .value.split(',')
+                      .map((stock) => ({
+                        name: stock.trim(),
+                        price: Math.floor(Math.random() * 1000), 
+                        shares: Math.floor(Math.random() * 100),
+                      })), 
                   })
                 }
               >
                 Create Investment
               </Button>
               <div>
-                <Button variant="outline" onClick={handleCloseCreateInvestmentDialog}>
+                <Button
+                  variant="outline"
+                  onClick={handleCloseCreateInvestmentDialog}
+                >
                   Cancel
                 </Button>
               </div>
@@ -260,33 +248,60 @@ export default function Investing() {
         </Dialog>
       )}
       {showCreatePortfolioDialog && (
-        <Dialog open={showCreatePortfolioDialog} onOpenChange={handleCloseCreatePortfolioDialog}>
+        <Dialog>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Create Portfolio</DialogTitle>
-              <DialogDescription>Enter the details for your new portfolio.</DialogDescription>
+              <DialogDescription>
+                Enter the details for your new portfolio.
+              </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid items-center grid-cols-4 gap-4">
                 <Label htmlFor="name" className="text-right">
                   Name
                 </Label>
-                <Input id="portfolioName" placeholder="Portfolio Name" className="col-span-3" />
+                <Input
+                  id="portfolioName" 
+                  placeholder="Portfolio Name"
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid items-center grid-cols-4 gap-4">
+                <Label htmlFor="stocks" className="text-right">
+                  Stocks
+                </Label>
+                <Textarea
+                  id="portfolioStocks"
+                  placeholder="Stock1, Stock2, Stock3"
+                  className="col-span-3"
+                />
               </div>
             </div>
             <DialogFooter>
               <Button
                 type="submit"
-                onClick={(e) =>
+                onClick={() => 
                   handleSavePortfolio({
-                    name: document.getElementById("portfolioName").value,
+                    name: document.getElementById('portfolioName').value, 
+                    stocks: document
+                      .getElementById('portfolioStocks') 
+                      .value.split(',')
+                      .map((stock) => ({
+                        name: stock.trim(),
+                        price: Math.floor(Math.random() * 1000), 
+                        shares: Math.floor(Math.random() * 100), 
+                      })), 
                   })
                 }
               >
                 Create Portfolio
               </Button>
               <div>
-                <Button variant="outline" onClick={handleCloseCreatePortfolioDialog}>
+                <Button
+                  variant="outline"
+                  onClick={handleCloseCreatePortfolioDialog}
+                >
                   Cancel
                 </Button>
               </div>
@@ -298,20 +313,118 @@ export default function Investing() {
   )
 }
 
-function HistoricalChart({ data }) {
+function AreachartstackedChart(props) {
   return (
-    <ChartContainer className="h-[400px]" config={{}}>
-      <LineChart data={data}>
-        <CartesianGrid stroke="#f5f5f5" />
-        <XAxis dataKey="date" />
-        <YAxis />
-        <ChartTooltip />
-        {Object.keys(data[0] || { value: 0 })
-          .filter((key) => key !== "date")
-          .map((portfolioName, index) => (
-            <Line key={index} type="monotone" dataKey={portfolioName} stroke={`var(--chart-${index + 1})`}/>
-          ))}
-      </LineChart>
-    </ChartContainer>
+    <div {...props}>
+      <ChartContainer
+        config={{
+          desktop: {
+            label: "Desktop",
+            color: "hsl(var(--chart-1))",
+          },
+          mobile: {
+            label: "Mobile",
+            color: "hsl(var(--chart-2))",
+          },
+        }}
+        className="min-h-[300px]"
+      >
+        <AreaChart
+          accessibilityLayer
+          data={[
+            { month: "January", desktop: 186, mobile: 80 },
+            { month: "February", desktop: 305, mobile: 200 },
+            { month: "March", desktop: 237, mobile: 120 },
+            { month: "April", desktop: 73, mobile: 190 },
+            { month: "May", desktop: 209, mobile: 130 },
+            { month: "June", desktop: 214, mobile: 140 },
+          ]}
+          margin={{
+            left: 12,
+            right: 12,
+          }}
+        >
+          <CartesianGrid vertical={false} />
+          <XAxis
+            dataKey="month"
+            tickLine={false}
+            axisLine={false}
+            tickMargin={8}
+            tickFormatter={(value) => value.slice(0, 3)}
+          />
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent indicator="dot" />}
+          />
+          <Area
+            dataKey="mobile"
+            type="natural"
+            fill="var(--color-mobile)"
+            fillOpacity={0.4}
+            stroke="var(--color-mobile)"
+            stackId="a"
+          />
+          <Area
+            dataKey="desktop"
+            type="natural"
+            fill="var(--color-desktop)"
+            fillOpacity={0.4}
+            stroke="var(--color-desktop)"
+            stackId="a"
+          />
+        </AreaChart>
+      </ChartContainer>
+    </div>
+  )
+}
+
+function LinechartChart(props) {
+  return (
+    <div {...props}>
+      <ChartContainer
+        config={{
+          desktop: {
+            label: "Desktop",
+            color: "hsl(var(--chart-1))",
+          },
+        }}
+      >
+        <LineChart
+          accessibilityLayer
+          data={[
+            { month: "January", desktop: 186 },
+            { month: "February", desktop: 305 },
+            { month: "March", desktop: 237 },
+            { month: "April", desktop: 73 },
+            { month: "May", desktop: 209 },
+            { month: "June", desktop: 214 },
+          ]}
+          margin={{
+            left: 12,
+            right: 12,
+          }}
+        >
+          <CartesianGrid vertical={false} />
+          <XAxis
+            dataKey="month"
+            tickLine={false}
+            axisLine={false}
+            tickMargin={8}
+            tickFormatter={(value) => value.slice(0, 3)}
+          />
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent hideLabel />}
+          />
+          <Line
+            dataKey="desktop"
+            type="natural"
+            stroke="var(--color-desktop)"
+            strokeWidth={2}
+            dot={false}
+          />
+        </LineChart>
+      </ChartContainer>
+    </div>
   )
 }

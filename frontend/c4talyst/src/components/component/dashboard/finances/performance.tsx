@@ -63,7 +63,10 @@ export function Performance() {
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
-      const { score, reason } = data;
+      
+      console.log(data);
+      const { score, reason } = JSON.parse(data);
+
       setScore(score);
       setReason(reason);
 

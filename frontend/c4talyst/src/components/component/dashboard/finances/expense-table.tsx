@@ -152,12 +152,12 @@ export function ExpenseTable() {
         expense.id === id
           ? {
               ...expense,
-              name: updatedExpense.name,
-              frequency: updatedExpense.frequency,
-              amount: updatedExpense.amount,
-              date: updatedExpense.date,
-              color: updatedExpense.color,
-              description: updatedExpense.description,
+              name: updatedExpense.name ?? expense.name,
+              frequency: updatedExpense.frequency ?? expense.frequency,
+              amount: updatedExpense.amount ?? expense.amount,
+              date: updatedExpense.date ?? expense.date,
+              color: updatedExpense.color ?? expense.color,
+              description: updatedExpense.description ?? expense.description,
             }
           : expense,
       ),

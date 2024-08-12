@@ -196,12 +196,9 @@ class PortfolioService:
     
     @staticmethod
     def get_stock_price(symbol, date1=None):
-        symbol = symbol[1:] if symbol.startswith('$') else symbol
-        if date1 is None:
-            date1 = date.today()
         try:
             stock = yf.Ticker(symbol)
         except Exception as e:
             return jsonify({'error': 'Invalid symbol'}), 400
-        data = stock.history(start=date, end=date)['Close'].values[0]
-        return data
+        data = stock.info['regularMarketPrice']
+        return jsonify({'price': data})

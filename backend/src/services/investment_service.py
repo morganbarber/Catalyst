@@ -170,15 +170,15 @@ class PortfolioService:
         return jsonify(response)
     
     @staticmethod
-    def get_portfolio_historical_data(portfolio_id):
+    def get_portfolio_historical_data():
         user_id = get_jwt_identity()
-        portfolio = Portfolio.query.filter_by(id=portfolio_id, user_id=user_id).first()
-        if not portfolio:
+        portfolios = Portfolio.query.filter_by(user_id=user_id).all()
+        if not portfolios:
             raise NotFound('Portfolio not found')
 
-        investments = Investment.query.filter_by(portfolio_id=portfolio_id).all()
-        historical_data = {}
+        data = {}
 
+<<<<<<< HEAD
         today = date.today()
         start_dates = [(today - timedelta(days=30 * i)).replace(day=1) for i in range(1, 7)]
 
@@ -190,6 +190,22 @@ class PortfolioService:
                     price = InvestmentService.get_stock_price(investment.name)
                     historical_prices.append(price)
                 historical_data[investment.name] = historical_prices
+=======
+        for portfolio in portfolios:
+            portfolio_id = portfolio.id
+            
+            investments = Investment.query.filter_by(portfolio_id=portfolio_id).all()
+            historical_data = {}
+    
+            today = date.today()
+            start_dates = [(today - timedelta(days=30 * i)).replace(day=1) for i in range(1, 7)]
+    
+            for investment in investments:
+                if investment.portfolio_id == portfolio_id:
+                    # get price 6 months ago, 5 months ago, 4 months ago, 3 months ago, 2 months ago, 1 month ago
+                    historical_data[investment.name] = [yf.Ticker(investment.name).history(start=start_date, end=start_date + timedelta(days=30))['Close'].iloc[0] for start_date in start_dates]
+                    print(historical_data)
+>>>>>>> de8c7afa1f59d1e3fd7a73dde2b534349a0135fc
 
         return jsonify(historical_data)
     

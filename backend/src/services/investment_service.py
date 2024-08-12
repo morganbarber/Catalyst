@@ -173,28 +173,47 @@ class PortfolioService:
     
     @staticmethod
     def get_portfolio_historical_data():
+        """
+        Retrieves the total value of all user portfolios over the past 6 months.
+
+        Returns:
+            dict: A dictionary where keys are portfolio names and values are lists 
+                containing the total portfolio value for each day of the past 
+                6 months.
+        """
+
         user_id = get_jwt_identity()
         portfolios = Portfolio.query.filter_by(user_id=user_id).all()
         investments = Investment.query.filter_by(user_id=user_id).all()
+        
         if not portfolios:
             raise NotFound('Portfolio not found')
 
-        data = {}
-
-        today = date.today()
-        start_dates = [(today - timedelta(days=30 * i)).replace(day=1) for i in range(1, 7)]
-
         historical_data = {}
 
+        today = date.today()
+        start_date = today - relativedelta(months=6)
+
         for portfolio in portfolios:
+            historical_data[portfolio.name] = []
+            portfolio_values = [0] * 180  # Initialize with 180 days of data
+
             for investment in investments:
                 if investment.portfolio_id == portfolio.id:
-                    
-                    recent_data = yf.download(investment.name, start=today - relativedelta(months=6), end=today)
-                    historical_data[portfolio.name][investment.name] = recent_data['Close'].values.tolist()
-                    for i in historical_data[portfolio.name][investment.name]:
-                        historical_data[portfolio.name][investment.name] = int(i) * investment.amount
-                        print(historical_data[portfolio.name][investment.name])
+                    try:
+                        # Download historical data
+                        historical_prices = yf.download(investment.name, start=start_date, end=today)['Close']
+
+                        # Iterate through dates and calculate portfolio value
+                        for i, price in enumerate(historical_prices.values):
+                            if not pd.isna(price):  # Handle potential missing data
+                                portfolio_values[i] += price * investment.amount
+                    except Exception as e:
+                        # Handle potential errors with yfinance gracefully
+                        print(f"Error fetching data for {investment.name}: {e}")
+                        # Consider logging the error for debugging
+
+            historical_data[portfolio.name] = portfolio_values
 
         return historical_data
     

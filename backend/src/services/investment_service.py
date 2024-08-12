@@ -196,3 +196,12 @@ class PortfolioService:
             historical_data[investment.name] = ticker_data
 
         return jsonify(historical_data)
+    
+    @staticmethod
+    def get_stock_price(symbol):
+        try:
+            stock = yf.Ticker(symbol)
+        except Exception as e:
+            return jsonify({'error': 'Invalid symbol'}), 400
+        data = stock.info['regularMarketPrice']
+        return jsonify({'price': data})

@@ -66,7 +66,27 @@ export default function Component() {
   const [error, setError] = useState(null);
   const [cookies, setCookie] = useCookies();
 
-  const baseUrl = "http://35.83.115.56";
+  const baseUrl = "http://35.83.115.56:80";
+
+  const getPrice = async (symbol) => {
+    try {
+      const response = await fetch(`${baseUrl}/stocks/${symbol}`, {
+        headers: {
+          Authorization: `Bearer ${cookies.accessToken}`,
+        },
+    });
+    
+        if (!response.ok) {
+          throw new Error("Failed to fetch stock price");
+        }
+    
+        const data = await response.json();
+        return data.price;
+     } catch (error) {
+        setError(error.message);
+      }
+    };
+
 
   useEffect(() => {
     const fetchInvestments = async () => {
@@ -225,10 +245,9 @@ export default function Component() {
                       <TableRow key={investment.id}>
                         <TableCell />
                         <TableCell>{investment.name}</TableCell>
-                        <TableCell>${investment.amount.toFixed(2)}</TableCell>
+                        <TableCell>{investment.amount.toFixed(2)}</TableCell>
                         <TableCell className="text-right">
-                          {/* Calculate and display investment value here */}
-                          ${investment.amount.toFixed(2)}
+                          ${investment.amount * getPrice(investment.name)}
                         </TableCell>
                       </TableRow>
                     ))}

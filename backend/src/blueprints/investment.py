@@ -168,3 +168,12 @@ def get_portfolio_historical_data():
         return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': 'Internal server error'}), 500
+    
+@investment_bp.route('/stocks/<symbol>', methods=['GET'])
+@jwt_required()
+def get_stock_info(symbol):
+    try:
+        response = InvestmentService.get_stock_price(symbol)
+        return jsonify(response), 200
+    except Exception as e:
+        return jsonify({'error': 'Internal server error'}), 500

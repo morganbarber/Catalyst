@@ -753,29 +753,23 @@ function ChartAreaChart(props: { portfolios: Portfolio[] }) {
         const fetchData = async () => {
             try {
 
-            const portfolioData = await fetch(`${baseUrl}/portfolio/historical`
-                , {
-                    headers: {
-                        Authorization: `Bearer ${cookies.accessToken}`,
-                    },
-                }
-            ).then((response) => response.json()
-            )
-
-            console.log(portfolioData)
-
-            // Format data for the chart
+            const portfolioData = await fetch(`${baseUrl}/portfolio/historical`, {
+                headers: {
+                    Authorization: `Bearer ${cookies.accessToken}`,
+                },
+            }).then((response) => response.json());
+            
             const formattedData: ChartData[] = [];
             for (let i = 0; i < 6; i++) {
                 const monthData: ChartData = { month: i === 0 ? 'This Month' : `${i} Months Ago` };
                 props.portfolios.forEach((portfolio, index) => {
                     const portfolioName = portfolio.name;
-                    const historicalValues = Object.values(portfolioData[index] || {}); // Assuming historical data is an object with stock names as keys
-                    monthData[portfolioName] = historicalValues[i] as string | number || 0; // Handle cases where historical data might be missing for a specific month
+                    const historicalValues = portfolioData[portfolioName] || []; // Assuming historical data is an object with stock names as keys
+                    monthData[portfolioName] = historicalValues[i] || 0; // Handle cases where historical data might be missing for a specific month
                 });
                 formattedData.push(monthData);
             }
-
+            
             setChartData(formattedData);
             } catch (error) {
                 console.error(error);

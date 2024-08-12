@@ -190,17 +190,19 @@ class PortfolioService:
                     # get price 6 months ago, 5 months ago, 4 months ago, 3 months ago, 2 months ago, 1 month ago
                     historical_prices = []
                     for start_date in start_dates:
-                        price = PortfolioService.get_stock_price(investment.name)
+                        price = PortfolioService.get_stock_price_at_date(investment.name, start_date)
                         historical_prices.append(price)
                     historical_data[investment.name] = historical_prices
 
         return historical_data
     
     @staticmethod
-    def get_stock_price(symbol):
+    def get_stock_price_at_date(symbol, date=None):
+        if date is None:
+            date = date.today()
         try:
             stock = yf.Ticker(symbol)
         except Exception as e:
             return jsonify({'error': 'Invalid symbol'}), 400
-        data = stock.info['currentPrice']
+        data = stock.history(start=date, end=date)['Close'].values[0]
         return data

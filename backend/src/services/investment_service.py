@@ -9,6 +9,7 @@ from flask import jsonify
 import yfinance as yf
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
+import pandas as pd
 
 investment_schema = InvestmentSchema()
 investments_schema = InvestmentSchema(many=True)

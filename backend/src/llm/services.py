@@ -25,7 +25,7 @@ class Services:
 
         response = self.client.inference(context=context, prompt="score_finances")
 
-        return responses
+        return response
 
     def chat(self, data):
         messages = data["messages"]

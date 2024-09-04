@@ -65,7 +65,7 @@ export function Login() {
               <span className="w-full border-t" />
             </div>
           <p className="text-muted-foreground">
-            Don&apos;t have an account?{" "}
+            Don&apos;t have an account?
             <Link href="/signup" className="underline underline-offset-4">
               Sign up now
             </Link>

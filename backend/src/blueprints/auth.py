@@ -17,7 +17,7 @@ def signup():
         response = AuthService.signup(user_data)
         return jsonify(response), 201
     except BadRequest as e:
-        return jsonify({'error': str(e)}), 400
+        return jsonify({'error': 'Bad request'}), 400
     except Exception as e:
         return jsonify({'error': 'Internal server error'}), 500
 
@@ -50,9 +50,9 @@ def login():
         response = AuthService.login(user_data)
         return jsonify(response), 200
     except Unauthorized as e:
-        return jsonify({'error': str(e)}), 401
+        return jsonify({'error': 'Unauthorized'), 401
     except BadRequest as e:
-        return jsonify({'error': str(e)}), 400
+        return jsonify({'error': 'Bad Request'}), 400
     except Exception as e:
         return jsonify({'error': 'Internal server error'}), 500
 
@@ -75,7 +75,7 @@ def refresh():
         response = AuthService.refresh_token()
         return jsonify(response), 200
     except Unauthorized as e:
-        return jsonify({'error': str(e)}), 401
+        return jsonify({'error': 'Unauthorized'}), 401
     except Exception as e:
         return jsonify({'error': 'Internal server error'}), 500
     
@@ -99,7 +99,7 @@ def logout():
         response = AuthService.logout()
         return jsonify(response), 200
     except Unauthorized as e:
-        return jsonify({'error': str(e)}), 401
+        return jsonify({'error': 'Unauthorized'}), 401
     except Exception as e:
         return jsonify({'error': 'Internal server error'}), 500
     

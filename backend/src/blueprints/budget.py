@@ -12,9 +12,9 @@ def create_budget():
         budget_data = request.get_json()
         response = BudgetService.create_budget(budget_data)
         return jsonify(response), 201
-    except BadRequest as e:
-        return jsonify({'error': str(e)}), 400
-    except Exception as e:
+    except BadRequest:
+        return jsonify({'error': 'Bad request'}), 400
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
 
 @budget_bp.route('/budgets', methods=['GET'])
@@ -23,9 +23,9 @@ def get_budgets():
     try:
         response = BudgetService.get_budgets()
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except Exception as e:
+    except NotFound:
+        return jsonify({'error': 'Resource not found'}), 404
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
 
 @budget_bp.route('/budgets/<int:budget_id>', methods=['GET'])
@@ -35,7 +35,7 @@ def get_budget(budget_id):
         response = BudgetService.get_budget(budget_id)
         return jsonify(response), 200
     except NotFound as e:
-        return jsonify({'error': str(e)}), 404
+        return jsonify({'error': 'Not Found'}), 404
     except Exception as e:
         return jsonify({'error': 'Internal server error'}), 500
 
@@ -46,11 +46,11 @@ def update_budget(budget_id):
         budget_data = request.get_json()
         response = BudgetService.update_budget(budget_id, budget_data)
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except BadRequest as e:
-        return jsonify({'error': str(e)}), 400
-    except Exception as e:
+    except NotFound:
+        return jsonify({'error': 'Resource not found'}), 404
+    except BadRequest:
+        return jsonify({'error': 'Bad request'}), 400
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
 
 @budget_bp.route('/budgets/<int:budget_id>', methods=['DELETE'])
@@ -60,6 +60,6 @@ def delete_budget(budget_id):
         response = BudgetService.delete_budget(budget_id)
         return jsonify(response), 200
     except NotFound as e:
-        return jsonify({'error': str(e)}), 404
+        return jsonify({'error': 'Not Found'}), 404
     except Exception as e:
         return jsonify({'error': 'Internal server error'}), 500

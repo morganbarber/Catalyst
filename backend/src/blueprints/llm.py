@@ -1,9 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
-from llm import client, services
-from werkzeug.exceptions import NotFound, BadRequest
-
-from llm import Services
+from llm import client, Services
+from werkzeug.exceptions import NotFound
 
 llm_bp = Blueprint('llm', __name__)
 llm_client = client()
@@ -15,18 +13,18 @@ def score_finances():
     try:
         response = llm_services.score_finances()
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except Exception as e:
-        return jsonify({'error': 'Internal server error'})
+    except NotFound:
+        return jsonify({'error': 'Not found'}), 404
+    except Exception:
+        return jsonify({'error': 'Internal server error'}), 500
 
-@jwt_required
+@jwt_required()
 @llm_bp.route('/chat', methods=['POST'])
 def chat():
     try:
         response = llm_services.chat(request.get_json())
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except Exception as e:
-        return jsonify({'error': 'Internal server error'})
+    except NotFound:
+        return jsonify({'error': 'Not found'}), 404
+    except Exception:
+        return jsonify({'error': 'Internal server error'}), 500

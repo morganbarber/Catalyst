@@ -12,9 +12,9 @@ def create_income():
         income_data = request.get_json()
         response = IncomeTrackingService.create_income(income_data)
         return jsonify(response), 201
-    except BadRequest as e:
-        return jsonify({'error': str(e)}), 400
-    except Exception as e:
+    except BadRequest:
+        return jsonify({'error': 'Bad request'}), 400
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
 
 @income_bp.route('/income', methods=['GET'])
@@ -23,9 +23,9 @@ def get_incomes():
     try:
         response = IncomeTrackingService.get_incomes()
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except Exception as e:
+    except NotFound:
+        return jsonify({'error': 'Not found'}), 404
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
 
 @income_bp.route('/income/<int:income_id>', methods=['GET'])
@@ -34,9 +34,9 @@ def get_income(income_id):
     try:
         response = IncomeTrackingService.get_income(income_id)
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except Exception as e:
+    except NotFound:
+        return jsonify({'error': 'Not found'}), 404
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
 
 @income_bp.route('/income/<int:income_id>', methods=['PUT'])
@@ -46,11 +46,11 @@ def update_income(income_id):
         income_data = request.get_json()
         response = IncomeTrackingService.update_income(income_id, income_data)
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except BadRequest as e:
-        return jsonify({'error': str(e)}), 400
-    except Exception as e:
+    except NotFound:
+        return jsonify({'error': 'Not found'}), 404
+    except BadRequest:
+        return jsonify({'error': 'Bad request'}), 400
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
 
 @income_bp.route('/income/<int:income_id>', methods=['DELETE'])
@@ -59,7 +59,7 @@ def delete_income(income_id):
     try:
         response = IncomeTrackingService.delete_income(income_id)
         return response, 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except Exception as e:
+    except NotFound:
+        return jsonify({'error': 'Not found'}), 404
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500

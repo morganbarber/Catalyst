@@ -12,10 +12,10 @@ def create_expense():
         expense_data = request.get_json()
         response = ExpenseTrackingService.create_expense(expense_data)
         return jsonify(response), 201
-    except BadRequest as e:
-        return jsonify({'error': str(e)}), 400
-    except Exception as e:
-        return jsonify({'error': 'Internal server error'}), 500
+    except BadRequest:
+        return jsonify({'error': 'Bad request: Invalid data format or missing fields.'}), 400
+    except Exception:
+        return jsonify({'error': 'An internal server error occurred.'}), 500
 
 @expense_bp.route('/expense', methods=['GET'])
 @jwt_required()
@@ -23,10 +23,10 @@ def get_expenses():
     try:
         response = ExpenseTrackingService.get_expenses()
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except Exception as e:
-        return jsonify({'error': 'Internal server error'}), 500
+    except NotFound:
+        return jsonify({'error': 'No expense records were found.'}), 404
+    except Exception:
+        return jsonify({'error': 'An internal server error occurred.'}), 500
 
 @expense_bp.route('/expense/<int:expense_id>', methods=['GET'])
 @jwt_required()
@@ -34,10 +34,10 @@ def get_expense(expense_id):
     try:
         response = ExpenseTrackingService.get_expense(expense_id)
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except Exception as e:
-        return jsonify({'error': 'Internal server error'}), 500
+    except NotFound:
+        return jsonify({'error': 'The requested expense was not found.'}), 404
+    except Exception:
+        return jsonify({'error': 'An internal server error occurred.'}), 500
 
 @expense_bp.route('/expense/<int:expense_id>', methods=['PUT'])
 @jwt_required()
@@ -46,20 +46,20 @@ def update_expense(expense_id):
         expense_data = request.get_json()
         response = ExpenseTrackingService.update_expense(expense_id, expense_data)
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except BadRequest as e:
-        return jsonify({'error': str(e)}), 400
-    except Exception as e:
-        return jsonify({'error': 'Internal server error'}), 500
+    except NotFound:
+        return jsonify({'error': 'The expense to update was not found.'}), 404
+    except BadRequest:
+        return jsonify({'error': 'Bad request: Invalid data format or missing fields.'}), 400
+    except Exception:
+        return jsonify({'error': 'An internal server error occurred.'}), 500
 
 @expense_bp.route('/expense/<int:expense_id>', methods=['DELETE'])
 @jwt_required()
 def delete_expense(expense_id):
     try:
         response = ExpenseTrackingService.delete_expense(expense_id)
-        return response, 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except Exception as e:
-        return jsonify({'error': 'Internal server error'}), 500
+        return jsonify(response), 200
+    except NotFound:
+        return jsonify({'error': 'The expense to delete was not found.'}), 404
+    except Exception:
+        return jsonify({'error': 'An internal server error occurred.'}), 500

@@ -13,7 +13,7 @@ def get_investment_recommendations():
     try:
         response = InvestmentService.get_investment_recommendations()
         return jsonify(response), 200
-    except Exception as e:
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
 
 @investment_bp.route('/investments', methods=['POST'])
@@ -23,9 +23,9 @@ def create_investment():
         investment_data = request.get_json()
         response = InvestmentService.create_investment(investment_data)
         return jsonify(response), 201
-    except BadRequest as e:
-        return jsonify({'error': str(e)}), 400
-    except Exception as e:
+    except BadRequest:
+        return jsonify({'error': 'Bad request'}), 400
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
 
 @investment_bp.route('/investments', methods=['GET'])
@@ -34,10 +34,9 @@ def get_investments():
     try:
         response = InvestmentService.get_investments()
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except Exception as e:
-        print(e)
+    except NotFound:
+        return jsonify({'error': 'Not found'}), 404
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
 
 @investment_bp.route('/investments/<int:investment_id>', methods=['GET'])
@@ -46,9 +45,9 @@ def get_investment(investment_id):
     try:
         response = InvestmentService.get_investment(investment_id)
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except Exception as e:
+    except NotFound:
+        return jsonify({'error': 'Not found'}), 404
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
 
 @investment_bp.route('/investments/<int:investment_id>', methods=['PUT'])
@@ -58,11 +57,11 @@ def update_investment(investment_id):
         investment_data = request.get_json()
         response = InvestmentService.update_investment(investment_id, investment_data)
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except BadRequest as e:
-        return jsonify({'error': str(e)}), 400
-    except Exception as e:
+    except NotFound:
+        return jsonify({'error': 'Not found'}), 404
+    except BadRequest:
+        return jsonify({'error': 'Bad request'}), 400
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
 
 @investment_bp.route('/investments/<int:investment_id>', methods=['DELETE'])
@@ -71,9 +70,9 @@ def delete_investment(investment_id):
     try:
         response = InvestmentService.delete_investment(investment_id)
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except Exception as e:
+    except NotFound:
+        return jsonify({'error': 'Not found'}), 404
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
 
 @investment_bp.route('/portfolios', methods=['POST'])
@@ -83,9 +82,9 @@ def create_portfolio():
         portfolio_data = request.get_json()
         response = PortfolioService.create_portfolio(portfolio_data)
         return jsonify(response), 201
-    except BadRequest as e:
-        return jsonify({'error': str(e)}), 400
-    except Exception as e:
+    except BadRequest:
+        return jsonify({'error': 'Bad request'}), 400
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
 
 @investment_bp.route('/portfolios', methods=['GET'])
@@ -94,9 +93,9 @@ def get_portfolios():
     try:
         response = PortfolioService.get_portfolios()
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except Exception as e:
+    except NotFound:
+        return jsonify({'error': 'Not found'}), 404
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
 
 @investment_bp.route('/portfolios/<int:portfolio_id>', methods=['GET'])
@@ -105,9 +104,9 @@ def get_portfolio(portfolio_id):
     try:
         response = PortfolioService.get_portfolio(portfolio_id)
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except Exception as e:
+    except NotFound:
+        return jsonify({'error': 'Not found'}), 404
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
 
 @investment_bp.route('/portfolios/<int:portfolio_id>', methods=['PUT'])
@@ -117,11 +116,11 @@ def update_portfolio(portfolio_id):
         portfolio_data = request.get_json()
         response = PortfolioService.update_portfolio(portfolio_id, portfolio_data)
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except BadRequest as e:
-        return jsonify({'error': str(e)}), 400
-    except Exception as e:
+    except NotFound:
+        return jsonify({'error': 'Not found'}), 404
+    except BadRequest:
+        return jsonify({'error': 'Bad request'}), 400
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
 
 @investment_bp.route('/portfolios/<int:portfolio_id>', methods=['DELETE'])
@@ -130,9 +129,9 @@ def delete_portfolio(portfolio_id):
     try:
         response = PortfolioService.delete_portfolio(portfolio_id)
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except Exception as e:
+    except NotFound:
+        return jsonify({'error': 'Not found'}), 404
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
 
 @investment_bp.route('/portfolio/performance', methods=['GET'])
@@ -141,9 +140,9 @@ def monitor_performance():
     try:
         response = PortfolioService.monitor_performance()
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except Exception as e:
+    except NotFound:
+        return jsonify({'error': 'Not found'}), 404
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
 
 @investment_bp.route('/portfolio/adjustments', methods=['GET'])
@@ -152,9 +151,9 @@ def portfolio_adjustments():
     try:
         response = PortfolioService.portfolio_adjustments()
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except Exception as e:
+    except NotFound:
+        return jsonify({'error': 'Not found'}), 404
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
 
 @investment_bp.route('/portfolio/historical', methods=['GET'])
@@ -163,10 +162,9 @@ def get_portfolio_historical_data():
     try:
         response = PortfolioService.get_portfolio_historical_data()
         return jsonify(response), 200
-    except NotFound as e:
-        return jsonify({'error': str(e)}), 404
-    except Exception as e:
-        print(e)
+    except NotFound:
+        return jsonify({'error': 'Not found'}), 404
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
     
 @investment_bp.route('/stocks/<symbol>', methods=['GET'])
@@ -175,6 +173,5 @@ def get_stock_info(symbol):
     try:
         response = PortfolioService.get_stock_price(symbol)
         return jsonify(response), 200
-    except Exception as e:
-        print(e)
+    except Exception:
         return jsonify({'error': 'Internal server error'}), 500
